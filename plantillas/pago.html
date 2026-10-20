@@ -1,0 +1,44 @@
+<div class="wrap checkout">
+  {{ruta}}
+  <div class="steps">
+    <span class="active">1 Información</span>
+    →
+    <span>2 Entrega</span>
+    →
+    <span>3 Pago</span>
+    →
+    <span>4 Confirmación</span>
+  </div>
+  <h1 class="page-title">Ya casi es tuyo.</h1>
+  <p>Completa tus datos para registrar un pedido de prueba.</p>
+  <div class="two-col">
+    <form class="panel" id="checkout-form" data-form="checkout">
+      <h2>Información personal</h2>
+      <div class="fields">{{nombre}}{{apellido}}{{correo}}{{telefono}}</div>
+      <h2>Dirección de entrega</h2>
+      <div class="fields">{{ubicacion}}{{direccion}}{{referencia}}</div>
+      <h2>Método de entrega</h2>
+      <label class="radio-option">
+        <input type="radio" name="delivery" value="Envío nacional" checked />
+        Envío nacional · 3–5 días hábiles (estimado de demostración)
+      </label>
+      <h2>Método de pago</h2>
+      <label class="radio-option">
+        <input type="radio" name="payment" value="Transferencia bancaria" checked />
+        Transferencia bancaria
+      </label>
+      <label class="radio-option">
+        <input type="radio" name="payment" value="Pago contra entrega" />
+        Pago contra entrega
+      </label>
+      <p class="demo-note">
+        Este formulario simula una compra. No se solicita ni procesa información bancaria.
+      </p>
+      <label>
+        <input type="checkbox" required />
+        Acepto registrar un pedido de demostración.
+      </label>
+    </form>
+    {{resumen}}
+  </div>
+</div>

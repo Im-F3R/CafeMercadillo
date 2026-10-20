@@ -1,0 +1,26 @@
+<div class="panel order">
+  <div class="order-head">
+    <h3>Pedido #{{numero}}</h3>
+    <span class="status">{{estado}}</span>
+  </div>
+  <p>{{fecha}} · {{pago}}</p>
+  {{productos}}
+  <div class="sumrow">
+    <span>Dirección</span>
+    <span>{{direccion}}, {{ciudad}}</span>
+  </div>
+  <div class="sumrow total">
+    <span>Total</span>
+    <span>{{total}}</span>
+  </div>
+  <p class="demo-note">Pedido de demostración. No se ha realizado ningún cobro.</p>
+</div>
+<div class="steps">
+  <span class="active">● Recibido</span>
+  →
+  <span>Preparando</span>
+  →
+  <span>Enviado</span>
+  →
+  <span>Entregado</span>
+</div>

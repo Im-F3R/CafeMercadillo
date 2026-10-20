@@ -1,0 +1,30 @@
+<div class="wrap">
+  {{ruta}}{{buscador}}{{titulo}}{{subcategorias}}
+  <div class="toolbar">
+    <span>{{cantidadResultados}} productos encontrados</span>
+    <div>
+      <select id="sort" aria-label="Ordenar productos">
+        {{opcionesOrden}}
+      </select>
+      <button class="chip" data-action="filters">Filtros ☷</button>
+    </div>
+  </div>
+  <div class="catalog">
+    <aside class="filters" id="filters">
+      <h3>Filtrar productos</h3>
+      {{filtroCategoria}}
+      <label>
+        Precio máximo: {{precioMaximo}}
+        <input type="range" min="3" max="50" value="{{valorPrecio}}" data-filter="price" />
+      </label>
+      {{filtroPresentacion}}{{filtroOrigen}}{{filtrosCafe}}
+      <label>
+        <input type="checkbox" data-filter="stock" {{soloDisponibles}} />
+        Solo disponibles
+      </label>
+      <button class="btn secondary" data-action="clear-filters">Limpiar filtros</button>
+    </aside>
+    <div>{{productos}}{{paginacion}}</div>
+  </div>
+  {{recomendados}}{{informacionCafe}}
+</div>

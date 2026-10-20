@@ -1,0 +1,51 @@
+<div class="wrap">
+  {{ruta}}
+  <section class="section center">
+    <div class="eyebrow">ESTAMOS CERCA DE TI</div>
+    <h1 class="page-title">¿Cómo podemos ayudarte?</h1>
+    <form data-form="help-search" class="searchbar help-search">
+      <input
+        name="q"
+        type="search"
+        placeholder="Busca una pregunta"
+        aria-label="Buscar preguntas"
+      />
+      <button class="btn">Buscar</button>
+    </form>
+  </section>
+  <div class="help-cats">{{categorias}}</div>
+  <section class="section">
+    <div class="section-head">
+      <h2>Preguntas frecuentes</h2>
+      <button class="chip" data-action="help-clear">Ver todas</button>
+    </div>
+    <div id="faq-list">{{preguntas}}</div>
+  </section>
+  <section class="section two-col">
+    <div>
+      <h2>Hablemos</h2>
+      <form class="panel" data-form="contact">
+        <div class="fields">{{nombre}}{{correo}}</div>
+        {{asunto}}
+        <label class="spaced-panel">
+          Mensaje
+          <textarea name="message" required maxlength="2000"></textarea>
+        </label>
+        <button class="btn full">Enviar mensaje de prueba</button>
+        <p class="demo-note">El formulario muestra una confirmación local; no envía correos.</p>
+      </form>
+    </div>
+    <div class="panel">
+      <h2>Siempre cerca</h2>
+      <p>Loja, Ecuador</p>
+      <h3>Horario de atención</h3>
+      <p>
+        Lunes a viernes
+        <br />
+        09:00 a 18:00
+      </p>
+      <h3>Contacto y redes</h3>
+      <p>Correo, teléfono y redes oficiales pendientes de configuración.</p>
+    </div>
+  </section>
+</div>

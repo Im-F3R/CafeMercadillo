@@ -2,7 +2,7 @@
 
 Web de demostración en HTML, CSS y JavaScript, sin dependencias de compilación.
 
-Abre `index.html` en un navegador. Con Node.js puedes ejecutar `node server.cjs` y visitar http://localhost:3000.
+Ejecuta `node server.cjs` y visita http://localhost:3000. También puedes usar Live Server o la publicación en GitHub Pages. Las vistas HTML se cargan desde `plantillas/`, por lo que la web debe abrirse desde un servidor HTTP y no haciendo doble clic en `index.html`.
 
 Incluye las 14 vistas solicitadas y la sección de direcciones: inicio, catálogo, categoría, búsqueda, producto, carrito, checkout, confirmación, acceso/registro, cuenta, pedidos, favoritos, nosotros y ayuda.
 
@@ -18,6 +18,20 @@ Comprobaciones: `node verify.cjs` y `node --check app.js`.
 
 - index.html: entrada principal.
 - styles.css: sistema visual y diseño adaptable.
-- app.js: vistas, catálogo y comportamiento.
+- app.js: inicio de la aplicación, carga de plantillas y navegación.
+- plantillas/: HTML separado y con sangría para cada vista y componente.
+- js/datos.js: registros de productos, preguntas y ubicaciones.
+- js/estado.js: datos guardados y estado actual.
+- js/utilidades.js: formato de precios, campos y carga del contenido de plantillas.
+- js/componentes.js: encabezado, pie, tarjetas y componentes compartidos.
+- js/tienda.js: catálogo, categorías y detalle de productos.
+- js/compras.js: carrito, resumen y vistas de pedidos.
+- js/cuenta.js: vistas de registro, acceso y perfil.
+- js/ayuda.js: preguntas frecuentes y vista de ayuda.
+- js/acciones.js: funciones de cada acción y eventos de formularios y botones.
 - favicon.svg: icono de marca.
 - server.cjs: servidor local opcional, sin paquetes externos.
+
+No se requieren bibliotecas externas de JavaScript ni compilación. Los nombres de las funciones describen su acción y el código no contiene comentarios. Los datos locales existentes conservan sus claves para mantener carritos, cuentas y pedidos de pruebas anteriores.
+
+La portada usa tamaños fluidos para mantener la legibilidad en distintas pantallas. Las tarjetas indican a qué presentación corresponde el precio; el detalle muestra la presentación elegida y el total por cantidad. Volver a pulsar Ayuda restaura todas las preguntas y limpia la búsqueda. Si se pulsa un favorito sin sesión, se completa el guardado después de un acceso correcto; abandonar el acceso cancela esa intención.

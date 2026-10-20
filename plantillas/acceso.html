@@ -1,0 +1,23 @@
+<div class="wrap">
+  <div class="auth panel">
+    <div class="chips">
+      <button class="chip {{claseAcceso}}" data-action="auth-tab" data-value="login">
+        Iniciar sesión
+      </button>
+      <button class="chip {{claseRegistro}}" data-action="auth-tab" data-value="register">
+        Crear cuenta
+      </button>
+    </div>
+    <h2>{{titulo}}</h2>
+    <p>Tu rincón de sabores lojanos.</p>
+    <form data-form="auth">
+      {{datosRegistro}}{{correo}}{{contrasena}}{{confirmacion}}
+      <button class="btn full">{{textoBoton}}</button>
+    </form>
+    {{recuperacion}}
+    <p class="demo-note">
+      Mínimo 6 caracteres al crear la cuenta e iniciar sesión. Las cuentas de demostración se
+      guardan solo en este navegador. No uses una contraseña real.
+    </p>
+  </div>
+</div>

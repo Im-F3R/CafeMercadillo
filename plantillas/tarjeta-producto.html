@@ -1,0 +1,26 @@
+<article class="product">
+  <button
+    class="heart {{claseFavorito}}"
+    data-action="favorite"
+    data-id="{{id}}"
+    aria-label="{{accionFavorito}} favoritos: {{nombre}}"
+    aria-pressed="{{favoritoActivo}}"
+  >
+    {{iconoFavorito}}
+  </button>
+  <a class="photo" href="#producto?id={{idEnlace}}">
+    <img src="{{imagen}}" alt="{{textoAlternativo}}" loading="lazy" />
+  </a>
+  <div class="product-body">
+    <small>{{origen}} · {{peso}}</small>
+    <h3><a href="#producto?id={{idTitulo}}">{{titulo}}</a></h3>
+    <div class="price">{{precio}}</div>
+    <p class="price-caption">{{descripcionPrecio}}</p>
+    <div class="buttons">
+      <button class="btn" data-action="add" data-id="{{idCompra}}" {{disponibilidad}}>
+        {{textoCompra}}
+      </button>
+      {{botonDetalles}}
+    </div>
+  </div>
+</article>

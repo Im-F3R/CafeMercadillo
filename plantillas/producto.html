@@ -1,0 +1,98 @@
+<div class="wrap">
+  {{ruta}}
+  <section class="detail">
+    <div>
+      <img id="detail-photo" class="detail-image" src="{{imagen}}" alt="{{nombreImagen}}" />
+      <div class="thumbs">{{miniaturas}}</div>
+    </div>
+    <div>
+      <div class="eyebrow">{{origen}} · SELECCIÓN MERCADILLO</div>
+      <h1>{{nombre}}</h1>
+      <div class="stars">
+        ★★★★★
+        <span class="demo-note">Reseñas de demostración</span>
+      </div>
+      <div class="price product-unit-price" id="unit-price">{{precioUnitario}}</div>
+      <p id="price-description" class="price-description">
+        Precio por unidad según presentación y peso.
+      </p>
+      <div class="stock">{{disponibilidad}}</div>
+      <p>
+        Una selección que celebra los sabores de nuestra tierra. Ideal para acompañar tus momentos
+        favoritos.
+      </p>
+      <div class="fields">
+        <label>
+          Presentación
+          <select id="presentation">
+            {{presentaciones}}
+          </select>
+        </label>
+        <label>
+          Peso
+          <select id="weight">
+            {{pesos}}
+          </select>
+        </label>
+      </div>
+      {{molienda}}
+      <div class="purchase-total">
+        <label>
+          Cantidad
+          <input class="quantity-input" id="product-qty" type="number" min="1" max="99" value="1" />
+        </label>
+        <div aria-live="polite">
+          <span id="quantity-description">Total por 1 unidad</span>
+          <strong id="selection-total">{{total}}</strong>
+        </div>
+      </div>
+      <p class="demo-note">La molienda no tiene recargo. El envío se calcula en el carrito.</p>
+      <div class="buttons">
+        <button class="btn" data-action="add-detail" data-id="{{idCompra}}" {{estadoCompra}}>
+          Añadir al carrito →
+        </button>
+        <button class="btn secondary" data-action="favorite" data-id="{{idFavorito}}">
+          {{textoFavorito}}
+        </button>
+      </div>
+      <p class="demo-note">Envíos nacionales · Producto seleccionado · Compra de demostración</p>
+    </div>
+  </section>
+  <section class="section">{{caracteristicas}}</section>
+  {{perfilCafe}}
+  <section class="section">
+    <div class="section-head">
+      <h2>Opiniones</h2>
+      <button class="btn secondary" data-action="review">Escribir opinión</button>
+    </div>
+    <div class="panel">
+      <div class="stars">★★★★★</div>
+      <p>“Excelente aroma para empezar el día.”</p>
+      <strong>María P.</strong>
+      <p class="demo-note">Opinión ilustrativa.</p>
+    </div>
+    <form class="panel hidden spaced-panel" id="review-form" data-form="review">
+      <label>
+        Nombre
+        <input name="name" required maxlength="80" />
+      </label>
+      <label>
+        Valoración
+        <select name="rating">
+          <option>5</option>
+          <option>4</option>
+          <option>3</option>
+          <option>2</option>
+          <option>1</option>
+        </select>
+      </label>
+      <label>
+        Tu opinión
+        <textarea name="review" required maxlength="1000"></textarea>
+      </label>
+      <button class="btn full">Guardar opinión de demostración</button>
+    </form>
+    <div id="user-reviews"></div>
+  </section>
+  {{relacionados}}
+</div>
