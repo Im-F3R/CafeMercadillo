@@ -1157,3 +1157,108 @@ select:disabled {
   height: 1rem;
   margin-top: 0.75rem;
 }
+
+.product-information {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: white;
+  overflow: hidden;
+}
+
+.product-tabs {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--line);
+  background: #f1ece3;
+}
+
+.product-tab {
+  flex: 1 0 auto;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  padding: 18px 22px;
+  background: transparent;
+  color: var(--muted);
+  white-space: nowrap;
+  font-size: 0.875rem;
+}
+
+.product-tab.active {
+  border-bottom-color: var(--ink);
+  background: white;
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.product-tab:focus-visible {
+  outline-offset: -5px;
+}
+
+.product-information-panel {
+  padding: 26px 30px;
+  min-height: 170px;
+}
+
+.product-information-panel h3 {
+  margin-top: 0;
+}
+
+.coffee-profile {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 18px;
+}
+
+.coffee-score {
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: white;
+}
+
+.coffee-score-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.coffee-score-title > span {
+  font-weight: 600;
+}
+
+.coffee-score-title strong {
+  font-size: 1.75rem;
+}
+
+.coffee-score-title small {
+  font-size: 0.875rem;
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.coffee-scale {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 4px;
+  margin-top: 18px;
+}
+
+.coffee-scale-step {
+  height: 18px;
+  border-radius: 3px;
+  background: #e9e2d6;
+}
+
+.coffee-scale-step.filled {
+  background: var(--ink);
+}
+
+.coffee-scale-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 0.75rem;
+}

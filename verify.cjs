@@ -198,8 +198,44 @@ async function submit(type, values) {
   assert.equal(run('favorites.includes(2)'), true);
   assert.equal(run('favoritoPendiente'), null);
   assert.equal(context.location.hash, 'producto?id=2');
+  run('profile=null; favorites=[]; favoritoPendiente=null');
+  context.location.hash = '#producto?id=3';
+  run("cambiarFavorito({dataset:{id:'3'}})");
+  run("authTab='register'");
+  await submit('auth', {
+    email: 'beta@example.com',
+    password: 'abcdef',
+    confirm: 'incorrecta',
+    name: 'Beta',
+    surname: 'Prueba',
+  });
+  assert.equal(run('profile'), null);
+  assert.equal(run('favoritoPendiente'), 3);
+  await submit('auth', {
+    email: 'beta@example.com',
+    password: 'abcdef',
+    confirm: 'abcdef',
+    name: 'Beta',
+    surname: 'Prueba',
+  });
+  assert.equal(run('profile.email'), 'beta@example.com');
+  assert.equal(run('favorites.includes(3)'), true);
+  assert.equal(run('favoritoPendiente'), null);
+  assert.equal(context.location.hash, 'producto?id=3');
+  assert.equal(run("favoriteAccounts['beta@example.com'].includes(3)"), true);
+  assert.equal(run("favoriteAccounts['alpha@example.com'].includes(2)"), true);
+  assert.equal(run("favoriteAccounts['alpha@example.com'].includes(3)"), false);
+  const informacion = run('crearInformacionProducto(buscarProducto(1))');
+  assert.equal((informacion.match(/role="tabpanel"/g) || []).length, 1);
+  assert.equal((informacion.match(/role="tab"/g) || []).length, 5);
+  assert(!informacion.includes('<details>'));
+  run("seleccionarPestanaProducto({dataset:{value:'origen'},id:'tab-origen'})");
+  assert(element('#product-information-panel').innerHTML.includes('Mercadillo'));
+  const perfilCafe = run('crearPerfilCafe()');
+  assert.equal((perfilCafe.match(/class="coffee-scale-step /g) || []).length, 50);
+  assert(perfilCafe.includes('Aroma: 10 de 10'));
   console.log(
-    'OK: vistas, navegación, variantes, checkout, cuentas, pedidos, restauración de ayuda y favorito pendiente tras iniciar sesión.',
+    'OK: vistas, precios, checkout, pedidos, ayuda, pestañas horizontales, escala de 10 y favorito tras inicio de sesión o registro.',
   );
 })().catch((e) => {
   console.error(e);

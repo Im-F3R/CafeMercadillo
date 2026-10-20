@@ -148,11 +148,7 @@ function mostrarCatalogo(r) {
       ['high', 'Precio: mayor a menor'],
       ['name', 'Nombre'],
     ]
-      .map(
-        ([v, t]) => html`
-          <option value="${v}" ${sort === v ? 'selected' : ''}>${t}</option>
-        `,
-      )
+      .map(([v, t]) => html` <option value="${v}" ${sort === v ? 'selected' : ''}>${t}</option> `)
       .join(''),
     filtroCategoria: !category
       ? crearFiltro('Categoría', 'category', ['Café', 'Dulces', 'Tradicionales', 'Regalos'])
@@ -259,18 +255,10 @@ function mostrarProducto(id) {
     precioUnitario: formatearPrecio(p.price),
     disponibilidad: p.stock ? '● Disponible' : 'Agotado temporalmente',
     presentaciones: (p.category === 'Café' ? ['Molido', 'En grano'] : ['Unidad'])
-      .map(
-        (v) => html`
-          <option>${v}</option>
-        `,
-      )
+      .map((v) => html` <option>${v}</option> `)
       .join(''),
     pesos: (p.category === 'Café' ? ['250 g', '450 g', '900 g'] : [p.weight])
-      .map(
-        (w) => html`
-          <option>${w}</option>
-        `,
-      )
+      .map((w) => html` <option>${w}</option> `)
       .join(''),
     molienda:
       p.category === 'Café'
@@ -291,66 +279,144 @@ function mostrarProducto(id) {
     estadoCompra: p.stock ? '' : 'disabled',
     idFavorito: p.id,
     textoFavorito: favorites.includes(p.id) ? '♥ Guardado' : '♡ Añadir a favoritos',
-    caracteristicas: [
-      ['Descripción', 'Una selección artesanal para disfrutar el sabor y la tradición lojana.'],
-      ['Origen', `Origen de referencia: ${p.origin}, provincia de Loja, Ecuador.`],
-      [
-        'Características',
-        `${p.category === 'Café' ? 'Tostado ' + p.roast.toLowerCase() + ', perfil equilibrado y notas aromáticas.' : 'Producto tradicional seleccionado.'} Presentación: ${p.weight}.`,
-      ],
-      [
-        'Preparación recomendada',
-        'Para café filtrado, utiliza aproximadamente 15 g de café por cada 250 ml de agua. Ajusta la proporción a tu gusto.',
-      ],
-      [
-        'Conservación',
-        'Conserva en un lugar fresco y seco, protegido del sol y en un envase bien cerrado.',
-      ],
-    ]
-      .map(
-        ([t, c]) => html`
-          <details>
-            <summary>${t}</summary>
-            <p>${c}</p>
-          </details>
-        `,
-      )
-      .join(''),
-    perfilCafe:
-      p.category === 'Café'
-        ? html`
-            <section class="section">
-              <h2>Perfil del café</h2>
-              <p class="demo-note">Escala ilustrativa de intensidad de 1 a 5.</p>
-              <div class="profile-bars">
-                ${[
-                  ['Aroma', 5],
-                  ['Cuerpo', 4],
-                  ['Dulzor', 4],
-                  ['Acidez', 3],
-                  ['Tostado', 3],
-                ]
-                  .map(
-                    ([atributo, intensidad]) => html`
-                      <label class="coffee-attribute">
-                        <span class="coffee-attribute-title">
-                          <span>${atributo}</span>
-                          <strong>${intensidad}/5</strong>
-                        </span>
-                        <meter min="0" max="5" value="${intensidad}">${intensidad}/5</meter>
-                      </label>
-                    `,
-                  )
-                  .join('')}
-              </div>
-            </section>
-          `
-        : '',
+    caracteristicas: crearInformacionProducto(p),
+    perfilCafe: p.category === 'Café' ? crearPerfilCafe() : '',
     relacionados: crearSeccionProductos(
       'También te puede gustar',
       products.filter((x) => x.id !== p.id && x.category === p.category).slice(0, 4),
     ),
   });
+}
+
+function informacionProducto(producto) {
+  return [
+    {
+      id: 'descripcion',
+      titulo: 'Descripción',
+      texto: 'Una selección artesanal para disfrutar el sabor y la tradición lojana.',
+    },
+    {
+      id: 'origen',
+      titulo: 'Origen',
+      texto: `Origen de referencia: ${producto.origin}, provincia de Loja, Ecuador.`,
+    },
+    {
+      id: 'caracteristicas',
+      titulo: 'Características',
+      texto:
+        producto.category === 'Café'
+          ? `Tostado ${producto.roast.toLowerCase()}, perfil equilibrado y notas aromáticas. Pesos disponibles: 250 g, 450 g y 900 g.`
+          : `Producto tradicional seleccionado. Presentación: ${producto.weight}.`,
+    },
+    {
+      id: 'preparacion',
+      titulo: 'Preparación recomendada',
+      texto:
+        producto.category === 'Café'
+          ? 'Para café filtrado, utiliza aproximadamente 15 g de café por cada 250 ml de agua. Ajusta la proporción a tu gusto.'
+          : 'Disfruta el producto según su presentación y consulta las indicaciones de su envase.',
+    },
+    {
+      id: 'conservacion',
+      titulo: 'Conservación',
+      texto: 'Conserva en un lugar fresco y seco, protegido del sol y en un envase bien cerrado.',
+    },
+  ];
+}
+
+function crearInformacionProducto(producto) {
+  const apartados = informacionProducto(producto);
+
+  return html`
+    <div class="product-information">
+      <div
+        class="product-tabs"
+        role="tablist"
+        aria-label="Información del producto"
+        aria-orientation="horizontal"
+      >
+        ${apartados
+          .map(
+            (apartado, indice) => html`
+              <button
+                id="tab-${apartado.id}"
+                class="product-tab ${indice === 0 ? 'active' : ''}"
+                type="button"
+                role="tab"
+                aria-selected="${indice === 0}"
+                aria-controls="product-information-panel"
+                tabindex="${indice === 0 ? 0 : -1}"
+                data-action="product-tab"
+                data-value="${apartado.id}"
+              >
+                ${apartado.titulo}
+              </button>
+            `,
+          )
+          .join('')}
+      </div>
+      <div
+        id="product-information-panel"
+        class="product-information-panel"
+        role="tabpanel"
+        aria-labelledby="tab-descripcion"
+        tabindex="0"
+      >
+        <h3>${apartados[0].titulo}</h3>
+        <p>${apartados[0].texto}</p>
+      </div>
+    </div>
+  `;
+}
+
+function crearPerfilCafe() {
+  const atributos = [
+    { nombre: 'Aroma', valor: 10 },
+    { nombre: 'Cuerpo', valor: 8 },
+    { nombre: 'Dulzor', valor: 8 },
+    { nombre: 'Acidez', valor: 6 },
+    { nombre: 'Tostado', valor: 6 },
+  ];
+
+  return html`
+    <section class="section">
+      <h2>Perfil del café</h2>
+      <p class="demo-note">
+        Intensidad de 1 a 10: 1 es baja y 10 es alta. Valores ilustrativos de demostración.
+      </p>
+      <div class="coffee-profile">
+        ${atributos
+          .map(
+            (atributo) => html`
+              <div
+                class="coffee-score"
+                role="group"
+                aria-label="${atributo.nombre}: ${atributo.valor} de 10"
+              >
+                <div class="coffee-score-title">
+                  <span>${atributo.nombre}</span>
+                  <strong>${atributo.valor}<small>/10</small></strong>
+                </div>
+                <div class="coffee-scale" aria-hidden="true">
+                  ${Array.from(
+                    { length: 10 },
+                    (elemento, indice) => html`
+                      <span
+                        class="coffee-scale-step ${indice < atributo.valor ? 'filled' : ''}"
+                      ></span>
+                    `,
+                  ).join('')}
+                </div>
+                <div class="coffee-scale-labels" aria-hidden="true">
+                  <span>1</span><span>10</span>
+                </div>
+              </div>
+            `,
+          )
+          .join('')}
+      </div>
+    </section>
+  `;
 }
 
 function calcularPrecioVariante(p, presentation = p.presentation, weight = p.weight) {

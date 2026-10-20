@@ -359,6 +359,7 @@ function guardarOpinion(datos, formulario) {
 }
 
 const acciones = {
+  'product-tab': seleccionarPestanaProducto,
   add: agregarDesdeTarjeta,
   'add-detail': agregarDesdeDetalle,
   favorite: cambiarFavorito,
@@ -451,7 +452,50 @@ async function manejarFormulario(evento) {
   await accion(datos, formulario);
 }
 
+function seleccionarPestanaProducto(boton) {
+  const producto = buscarProducto(obtenerRuta().params.get('id') || 1);
+  if (!producto) return;
+
+  const apartado = informacionProducto(producto).find(
+    (registro) => registro.id === boton.dataset.value,
+  );
+  if (!apartado) return;
+
+  document.querySelectorAll('[data-action="product-tab"]').forEach((pestana) => {
+    const activa = pestana === boton;
+    pestana.classList.toggle('active', activa);
+    pestana.setAttribute('aria-selected', activa);
+    pestana.tabIndex = activa ? 0 : -1;
+  });
+
+  const panel = $('#product-information-panel');
+  panel.setAttribute('aria-labelledby', boton.id);
+  panel.innerHTML = html`<h3>${escaparTexto(apartado.titulo)}</h3>
+    <p>${escaparTexto(apartado.texto)}</p>`;
+}
+
+function manejarTecladoPestanas(evento) {
+  const boton = evento.target.closest('[data-action="product-tab"]');
+  if (!boton) return;
+
+  const teclas = ['ArrowLeft', 'ArrowRight', 'Home', 'End'];
+  if (!teclas.includes(evento.key)) return;
+
+  evento.preventDefault();
+  const pestanas = Array.from(document.querySelectorAll('[data-action="product-tab"]'));
+  let indice = pestanas.indexOf(boton);
+
+  if (evento.key === 'ArrowRight') indice = (indice + 1) % pestanas.length;
+  if (evento.key === 'ArrowLeft') indice = (indice - 1 + pestanas.length) % pestanas.length;
+  if (evento.key === 'Home') indice = 0;
+  if (evento.key === 'End') indice = pestanas.length - 1;
+
+  seleccionarPestanaProducto(pestanas[indice]);
+  pestanas[indice].focus();
+}
+
 document.addEventListener('click', manejarClick);
 document.addEventListener('input', manejarEntrada);
 document.addEventListener('change', manejarCambio);
 document.addEventListener('submit', manejarFormulario);
+document.addEventListener('keydown', manejarTecladoPestanas);
