@@ -1,6 +1,6 @@
 <div class="wrap">
   <div class="auth panel">
-    <div class="chips">
+    <div class="chips" role="group" aria-label="Acceso a la cuenta">
       <button class="chip {{claseAcceso}}" data-action="auth-tab" data-value="login">
         Iniciar sesión
       </button>
@@ -8,7 +8,7 @@
         Crear cuenta
       </button>
     </div>
-    <h2>{{titulo}}</h2>
+    <h1 class="auth-title">{{titulo}}</h1>
     <p>Tu rincón de sabores lojanos.</p>
     <form data-form="auth">
       {{datosRegistro}}{{correo}}{{contrasena}}{{confirmacion}}

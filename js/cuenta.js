@@ -14,7 +14,7 @@ function mostrarAcceso() {
     confirmacion:
       authTab === 'register'
         ? crearCampo('Confirmar contraseña', 'confirm', 'password') +
-          '<label><input type="checkbox" required>Acepto los términos de esta demostración.</label>'
+          '<label><input type="checkbox" name="terms" required>Acepto los términos de esta demostración.</label>'
         : '',
     textoBoton: authTab === 'login' ? 'Iniciar sesión' : 'Crear cuenta',
     recuperacion:
@@ -42,10 +42,10 @@ function mostrarCuenta(address = false) {
                     <h3>${escaparTexto(a.address)}</h3>
                     <p>${escaparTexto(a.city)} · ${escaparTexto(a.reference)}</p>
                     <div class="buttons">
-                      <button class="btn secondary" data-action="edit-address" data-index="${i}">
+                      <button class="btn secondary" data-action="edit-address" data-index="${i}" aria-label="Editar dirección ${escaparTexto(a.address)}, ${escaparTexto(a.city)}">
                         Editar
                       </button>
-                      <button class="btn secondary" data-action="delete-address" data-index="${i}">
+                      <button class="btn secondary" data-action="delete-address" data-index="${i}" aria-label="Eliminar dirección ${escaparTexto(a.address)}, ${escaparTexto(a.city)}">
                         Eliminar
                       </button>
                     </div>

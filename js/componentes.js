@@ -25,7 +25,7 @@ function mostrarEncabezado() {
     contenido2: simple
       ? '<span>♧ Compra segura</span>'
       : html`
-          <nav class="navlinks" aria-label="Navegación principal">
+          <nav id="main-navigation" class="navlinks" aria-label="Navegación principal">
             ${[
               ['inicio', 'Inicio'],
               ['tienda', 'Tienda'],
@@ -79,6 +79,7 @@ function mostrarEncabezado() {
             data-action="menu"
             aria-label="Abrir navegación"
             aria-expanded="false"
+            aria-controls="main-navigation"
           >
             ${icon('menu')}
           </button>
@@ -102,14 +103,14 @@ function mostrarPie() {
               </p>
             </div>
             <div>
-              <h3>Explora Mercadillo</h3>
+              <h2>Explora Mercadillo</h2>
               <a href="#tienda">Nuestra tienda</a>
               <a href="#categoria">Café lojano</a>
               <a href="#categoria?tipo=Tradicionales">Productos lojanos</a>
               <a href="#nosotros">Nuestra historia</a>
             </div>
             <div>
-              <h3>Estamos para ayudarte</h3>
+              <h2>Estamos para ayudarte</h2>
               <a href="#seguimiento">Consultar un pedido</a>
               <a href="#ayuda">Preguntas frecuentes</a>
               <a href="#ayuda?tema=Envíos">Envíos y entregas</a>
@@ -117,7 +118,7 @@ function mostrarPie() {
               <a href="#ayuda?tema=Cuenta">Términos y privacidad</a>
             </div>
             <div>
-              <h3>Hablemos</h3>
+              <h2>Hablemos</h2>
               <p>
                 Loja, Ecuador
                 <br />
@@ -152,7 +153,7 @@ function crearTarjetaProducto(p) {
     idCompra: p.id,
     disponibilidad: p.stock ? '' : 'disabled',
     textoCompra: p.stock ? 'Añadir al carrito' : 'Agotado',
-    botonDetalles: crearBoton('Ver detalles', `producto?id=${p.id}`, true),
+    botonDetalles: crearBoton('Ver detalles', `producto?id=${p.id}`, true, `Ver detalles de ${p.name}`),
   });
 }
 
@@ -197,7 +198,7 @@ function crearMenuCuenta(active) {
     ]
       .map(
         ([r, t]) => html`
-          <a class="${active === r ? 'active' : ''}" href="#${r}">${t}</a>
+          <a class="${active === r ? 'active' : ''}" href="#${r}" ${active === r ? 'aria-current="page"' : ''}>${t}</a>
         `,
       )
       .join(''),

@@ -56,6 +56,7 @@ function mostrarCarrito() {
       : html`
           <div class="two-col">
             <div>
+              <h2>Productos en tu carrito</h2>
               ${cart
                 .map((c, i) => {
                   const p = buscarProducto(c.id);
@@ -70,7 +71,7 @@ function mostrarCarrito() {
                           ${escaparTexto(c.presentation)} ·
                           ${escaparTexto(c.weight || p.weight)}${c.grind ? ' · ' + escaparTexto(c.grind) : ''}
                         </p>
-                        <button class="chip" data-action="remove-cart" data-index="${i}">
+                        <button class="chip" data-action="remove-cart" data-index="${i}" aria-label="Eliminar ${p.name}, ${escaparTexto(c.weight || p.weight)}, ${escaparTexto(c.presentation)}">
                           Eliminar
                         </button>
                       </div>
@@ -79,7 +80,7 @@ function mostrarCarrito() {
                           data-action="quantity"
                           data-index="${i}"
                           data-value="-1"
-                          aria-label="Reducir cantidad"
+                          aria-label="Reducir cantidad de ${p.name}, ${escaparTexto(c.weight || p.weight)}, ${escaparTexto(c.presentation)}"
                         >
                           −
                         </button>
@@ -88,7 +89,7 @@ function mostrarCarrito() {
                           data-action="quantity"
                           data-index="${i}"
                           data-value="1"
-                          aria-label="Aumentar cantidad"
+                          aria-label="Aumentar cantidad de ${p.name}, ${escaparTexto(c.weight || p.weight)}, ${escaparTexto(c.presentation)}"
                         >
                           +
                         </button>
@@ -121,14 +122,19 @@ function mostrarPago() {
 }
 
 function crearUbicacion() {
-  return (
-    '<label>Provincia<select name="province" id="province" required><option value="">--Seleccione una provincia--</option>' +
-    Object.keys(provinceCities)
-      .sort()
-      .map((p) => '<option>' + p + '</option>')
-      .join('') +
-    html`</select></label><label>Ciudad<select name="city" id="city" required disabled><option value="">--Seleccione una ciudad--</option></select></label>`
-  );
+  return html`
+    <label>Provincia
+      <select name="province" id="province" autocomplete="address-level1" required>
+        <option value="">--Seleccione una provincia--</option>
+        ${Object.keys(provinceCities).sort().map((provincia) => `<option>${provincia}</option>`).join('')}
+      </select>
+    </label>
+    <label>Ciudad
+      <select name="city" id="city" autocomplete="address-level2" required disabled>
+        <option value="">--Seleccione una ciudad--</option>
+      </select>
+    </label>
+  `;
 }
 
 function crearDetallePedido(o) {
@@ -158,7 +164,23 @@ function crearDetallePedido(o) {
     direccion: escaparTexto(o.address),
     ciudad: escaparTexto(o.city),
     total: formatearPrecio(o.total),
+    progreso: crearProgresoPedido(o.status),
   });
+}
+
+function crearProgresoPedido(estado) {
+  const etapas = ['Recibido', 'Preparando', 'Enviado', 'Entregado'];
+  const actual = etapas.indexOf(estado);
+  return html`
+    <ol class="steps order-progress" aria-label="Seguimiento del pedido">
+      ${etapas.map((etapa, indice) => html`
+        <li class="${indice === actual ? 'active' : ''}" ${indice === actual ? 'aria-current="step"' : ''}>
+          ${etapa}
+          <span class="sr-only">${indice === actual ? 'Estado actual' : indice < actual ? 'Completado' : 'Pendiente'}</span>
+        </li>
+      `).join('')}
+    </ol>
+  `;
 }
 
 function mostrarConfirmacion() {
@@ -199,6 +221,7 @@ function mostrarPedidos(r) {
                     class="chip ${t === orderFilter ? 'active' : ''}"
                     data-action="order-filter"
                     data-value="${t}"
+                    aria-pressed="${t === orderFilter}"
                   >
                     ${t}
                   </button>
@@ -222,7 +245,7 @@ function mostrarPedidos(r) {
                         </p>
                         <div class="order-head">
                           <strong>Total: ${formatearPrecio(o.total)}</strong>
-                          ${crearBoton('Ver detalle', `pedidos?id=${o.number}`, true)}
+                          ${crearBoton('Ver detalle', `pedidos?id=${o.number}`, true, `Ver detalle del pedido ${o.number}`)}
                         </div>
                       </article>
                     `,
@@ -241,20 +264,23 @@ function mostrarPedidos(r) {
 }
 
 function mostrarSeguimiento(r) {
-  return (
-    '<div class="wrap narrow">' +
-    crearRuta('Consultar pedido') +
-    html`
+  return html`
+      <div class="wrap narrow">
+      ${crearRuta('Consultar pedido')}
       <h1 class="page-title">Consulta tu pedido</h1>
       <p>
         No necesitas una cuenta. Ingresa el número de pedido y el correo que utilizaste al comprar.
       </p>
-      <form class="panel" data-form="tracking"></form>
-    ` +
-    crearCampo('Número de pedido', 'number', 'text', r.params.get('id') || '') +
-    crearCampo('Correo de la compra', 'email', 'email') +
-    html`<button class="btn full">Consultar estado</button></form><p class="demo-note">Los pedidos de prueba se consultan en el mismo navegador donde se realizó la compra.</p><div id="tracking-result"></div></div>`
-  );
+      <form class="panel" data-form="tracking">
+        ${crearCampo('Número de pedido', 'number', 'text', r.params.get('id') || '')}
+        ${crearCampo('Correo de la compra', 'email', 'email')}
+        <button class="btn full" type="submit">Consultar estado</button>
+      </form>
+      <p class="demo-note">Los pedidos de prueba se consultan en el mismo navegador donde se realizó la compra.</p>
+      <p id="tracking-status" role="status" aria-live="polite" aria-atomic="true"></p>
+      <div id="tracking-result"></div>
+      </div>
+  `;
 }
 
 function agregarAlCarrito(id, qty = 1, presentation, grind = '', weight) {

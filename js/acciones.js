@@ -33,10 +33,30 @@ function cambiarFavorito(boton) {
     : [...favorites, idProducto];
   favoriteAccounts[profile.email.toLowerCase()] = favorites;
   guardarDatos();
-  mostrarPagina();
+  if (obtenerRuta().name === 'favoritos') {
+    mostrarPagina();
+  } else {
+    actualizarBotonesFavoritos();
+    mostrarEncabezado();
+  }
   mostrarMensaje(
     favorites.includes(idProducto) ? 'Guardado en tus favoritos' : 'Eliminado de favoritos',
   );
+}
+
+function actualizarBotonesFavoritos() {
+  document.querySelectorAll('[data-action="favorite"]').forEach((boton) => {
+    const producto = buscarProducto(boton.dataset.id);
+    const guardado = favorites.includes(Number(boton.dataset.id));
+    boton.setAttribute('aria-pressed', String(guardado));
+    if (boton.classList.contains('heart')) {
+      boton.classList.toggle('selected', guardado);
+      boton.textContent = guardado ? '♥' : '♡';
+      boton.setAttribute('aria-label', `${guardado ? 'Eliminar de' : 'Añadir a'} favoritos: ${producto.name}`);
+    } else {
+      boton.textContent = guardado ? '♥ Guardado' : '♡ Añadir a favoritos';
+    }
+  });
 }
 
 function alternarMenu(boton) {
@@ -53,6 +73,7 @@ function cambiarCantidad(boton) {
   if (linea.qty <= 0) cart.splice(indice, 1);
   guardarDatos();
   mostrarPagina();
+  anunciar(`Cantidad de ${buscarProducto(linea.id).name}: ${Math.max(0, linea.qty)}. Total actualizado: ${formatearPrecio(totalPedidoActual())}.`);
 }
 
 function eliminarDelCarrito(boton) {
@@ -60,6 +81,7 @@ function eliminarDelCarrito(boton) {
   guardarDatos();
   mostrarPagina();
   mostrarMensaje('Producto eliminado del carrito');
+  anunciar(`Producto eliminado. Total actualizado: ${formatearPrecio(totalPedidoActual())}.`);
 }
 
 function limpiarFiltros(boton) {
@@ -67,11 +89,13 @@ function limpiarFiltros(boton) {
   page = 1;
   if (boton.dataset.action === 'reset-catalog') location.hash = 'tienda';
   mostrarPagina();
+  anunciarCatalogo();
 }
 
 function cambiarPagina(boton) {
   page = Number(boton.dataset.value);
   mostrarPagina();
+  anunciarCatalogo();
   window.scrollTo({ top: 200, behavior: 'smooth' });
 }
 
@@ -85,11 +109,17 @@ function cambiarSubcategoria(boton) {
   filters.presentation = filters.presentation === categoria ? '' : categoria;
   page = 1;
   mostrarPagina();
+  anunciarCatalogo();
 }
 
 function cambiarPestanaAcceso(boton) {
+  const correo = $('[data-form="auth"] [name="email"]')?.value || '';
   authTab = boton.dataset.value;
   mostrarPagina();
+  const campoCorreo = $('[data-form="auth"] [name="email"]');
+  if (campoCorreo) campoCorreo.value = correo;
+  enfocar($(`[data-action="auth-tab"][data-value="${authTab}"]`));
+  anunciar(authTab === 'register' ? 'Formulario para crear cuenta.' : 'Formulario para iniciar sesión.');
 }
 
 function cerrarSesion() {
@@ -106,6 +136,7 @@ function nuevaDireccion() {
   formulario.reset();
   formulario.elements.index.value = -1;
   formulario.classList.remove('hidden');
+  enfocar(formulario.querySelector('input[name="address"]'), false);
 }
 
 function editarDireccion(boton) {
@@ -117,6 +148,7 @@ function editarDireccion(boton) {
     formulario.elements[campo].value = addresses[indice][campo] || '';
   }
   formulario.scrollIntoView({ behavior: 'smooth' });
+  enfocar(formulario.querySelector('input[name="address"]'));
 }
 
 function eliminarDireccion(boton) {
@@ -128,6 +160,8 @@ function eliminarDireccion(boton) {
 function filtrarPedidos(boton) {
   orderFilter = boton.dataset.value;
   mostrarPagina();
+  const cantidad = document.querySelectorAll('#app .order').length;
+  anunciar(`${cantidad} pedidos. Filtro: ${orderFilter}.`);
 }
 
 function filtrarAyuda(boton) {
@@ -136,6 +170,7 @@ function filtrarAyuda(boton) {
   if (buscador) buscador.value = '';
   $('#faq-list').innerHTML = crearPreguntas('', helpCategory);
   actualizarCategoriasAyuda();
+  actualizarResumenAyuda();
 }
 
 function restablecerAyuda() {
@@ -145,6 +180,7 @@ function restablecerAyuda() {
   const preguntas = $('#faq-list');
   if (preguntas) preguntas.innerHTML = crearPreguntas('', '');
   actualizarCategoriasAyuda();
+  actualizarResumenAyuda();
 }
 
 function actualizarCategoriasAyuda() {
@@ -162,6 +198,8 @@ function actualizarCiudades(provincia) {
     ciudad.innerHTML += '<option>' + escaparTexto(nombre) + '</option>';
   }
   ciudad.disabled = !provincia;
+  limpiarErrorControl(ciudad);
+  anunciar(provincia ? 'Ciudades actualizadas. Selecciona una ciudad.' : 'Selecciona una provincia para habilitar las ciudades.');
 }
 
 function aplicarFiltro(control) {
@@ -171,9 +209,8 @@ function aplicarFiltro(control) {
   if (nombre === 'price') valor = Number(control.value);
   filters[nombre] = valor;
   page = 1;
-  const panelAbierto = $('#filters')?.classList.contains('open');
   mostrarPagina();
-  if (panelAbierto) $('#filters')?.classList.add('open');
+  anunciarCatalogo();
 }
 
 function buscarProductos(datos) {
@@ -194,13 +231,13 @@ function aplicarCupon(datos) {
   mostrarMensaje('Descuento del 10% aplicado');
 }
 
-async function iniciarSesion(datos) {
+async function iniciarSesion(datos, formulario) {
   if (datos.password.length < 6) {
-    mostrarMensaje('La contraseña debe tener al menos 6 caracteres');
+    errorFormulario(formulario, 'password', 'La contraseña debe tener al menos 6 caracteres.');
     return;
   }
   if (authTab === 'register' && datos.password !== datos.confirm) {
-    mostrarMensaje('Las contraseñas no coinciden');
+    errorFormulario(formulario, 'confirm', 'Las contraseñas no coinciden. Repite la contraseña anterior.');
     return;
   }
   const correo = datos.email.trim().toLowerCase();
@@ -208,7 +245,7 @@ async function iniciarSesion(datos) {
   let cuenta = accounts.find((registro) => registro.email === correo);
   if (authTab === 'register') {
     if (cuenta) {
-      mostrarMensaje('Este correo ya tiene una cuenta. Inicia sesión.');
+      errorFormulario(formulario, 'email', 'Este correo ya tiene una cuenta. Selecciona Iniciar sesión.');
       return;
     }
     cuenta = {
@@ -220,7 +257,7 @@ async function iniciarSesion(datos) {
     };
     accounts.push(cuenta);
   } else if (!cuenta || cuenta.digest !== credencial) {
-    mostrarMensaje('Correo o contraseña incorrectos. Crea una cuenta si aún no tienes una.');
+    errorFormulario(formulario, 'password', 'Correo o contraseña incorrectos. Revisa tus datos o crea una cuenta.');
     return;
   }
   profile = {
@@ -304,9 +341,15 @@ function crearRegistroPedido(datos) {
   };
 }
 
-function registrarPedido(datos) {
+function registrarPedido(datos, formulario) {
   if (!datosDeEntregaValidos(datos)) {
-    mostrarMensaje('Revisa el correo, el teléfono y la provincia y ciudad de entrega');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(datos.email)) {
+      errorFormulario(formulario, 'email', 'Ingresa un correo con formato nombre@dominio.com.');
+    } else if (!/^\d{10}$/.test(datos.phone)) {
+      errorFormulario(formulario, 'phone', 'Ingresa exactamente 10 dígitos.');
+    } else {
+      errorFormulario(formulario, datos.province ? 'city' : 'province', 'Selecciona una provincia y una ciudad correspondiente.');
+    }
     return;
   }
   if (!cart.length) {
@@ -332,12 +375,15 @@ function consultarPedido(datos) {
   $('#tracking-result').innerHTML = pedido
     ? crearDetallePedido(pedido)
     : '<div class="panel"><p>No encontramos un pedido con esos datos en este navegador.</p></div>';
+  $('#tracking-status').textContent = pedido ? `Pedido ${pedido.number} encontrado. Estado: ${pedido.status}.` : 'No encontramos un pedido con esos datos en este navegador.';
+  if (pedido) enfocar($('#tracking-result h2'), false);
 }
 
 function buscarAyuda(datos) {
   helpCategory = '';
   $('#faq-list').innerHTML = crearPreguntas(datos.q.trim(), '');
   actualizarCategoriasAyuda();
+  actualizarResumenAyuda();
 }
 
 function guardarOpinion(datos, formulario) {
@@ -356,6 +402,8 @@ function guardarOpinion(datos, formulario) {
   formulario.reset();
   formulario.classList.add('hidden');
   mostrarMensaje('Opinión de prueba añadida');
+  enfocar($('[data-action="review"]'));
+  $('[data-action="review"]').setAttribute('aria-expanded', 'false');
 }
 
 const acciones = {
@@ -369,7 +417,7 @@ const acciones = {
   gallery: (boton) => {
     $('#detail-photo').src = boton.dataset.src;
   },
-  filters: () => $('#filters').classList.toggle('open'),
+  filters: alternarFiltros,
   'clear-filters': limpiarFiltros,
   'reset-catalog': limpiarFiltros,
   page: cambiarPagina,
@@ -384,7 +432,7 @@ const acciones = {
   'order-filter': filtrarPedidos,
   'help-category': filtrarAyuda,
   'help-clear': restablecerAyuda,
-  review: () => $('#review-form').classList.toggle('hidden'),
+  review: alternarOpinion,
 };
 
 const formularios = {
@@ -404,9 +452,9 @@ const formularios = {
 };
 
 function manejarClick(evento) {
-  if (evento.target.closest('a[href="#contenido"]')) {
+  if (evento.target.closest('a[href="#app"]')) {
     evento.preventDefault();
-    $('#app').focus();
+    enfocar($('#app'));
     $('#app').scrollIntoView();
     return;
   }
@@ -426,11 +474,13 @@ function manejarClick(evento) {
 function manejarEntrada(evento) {
   const control = evento.target;
   if (control.type === 'tel') control.value = control.value.replace(/[^0-9]/g, '').slice(0, 10);
+  limpiarErrorControl(control);
   if (control.id === 'product-qty') actualizarSeleccion();
 }
 
 function manejarCambio(evento) {
   const control = evento.target;
+  limpiarErrorControl(control);
   if (['presentation', 'weight', 'grind', 'product-qty'].includes(control.id))
     actualizarSeleccion();
   if (control.id === 'province') actualizarCiudades(control.value);
@@ -439,6 +489,7 @@ function manejarCambio(evento) {
     sort = control.value;
     page = 1;
     mostrarPagina();
+    anunciarCatalogo();
   }
 }
 
@@ -447,9 +498,14 @@ async function manejarFormulario(evento) {
   const accion = formularios[formulario.dataset.form];
   if (!accion) return;
   evento.preventDefault();
-  if (!formulario.reportValidity()) return;
+  if (!validarFormulario(formulario)) return;
   const datos = Object.fromEntries(new FormData(formulario));
-  await accion(datos, formulario);
+  try {
+    await accion(datos, formulario);
+  } catch (error) {
+    anunciar('No se pudo completar la operación. Conservamos tus datos para que puedas intentarlo de nuevo.');
+    console.error(error);
+  }
 }
 
 function seleccionarPestanaProducto(boton) {

@@ -5,7 +5,8 @@ function obtenerRuta() {
   return { name, params: new URLSearchParams(query || '') };
 }
 
-function mostrarPagina() {
+function mostrarPagina(conservarFoco = true) {
+  const focoAnterior = conservarFoco ? capturarFoco() : null;
   const ruta = obtenerRuta();
   mostrarEncabezado();
   mostrarPie();
@@ -30,6 +31,9 @@ function mostrarPagina() {
   $('#app').innerHTML = (views[ruta.name] || mostrarInicio)();
   actualizarSeleccion();
   actualizarCategoriasAyuda();
+  prepararAccesibilidad();
+  actualizarResumenAyuda();
+  restaurarFoco(focoAnterior);
   $('#app').setAttribute('aria-busy', 'false');
   const titulos = {
     inicio: 'El sabor de nuestra tierra',
@@ -53,12 +57,15 @@ function mostrarPagina() {
 }
 
 function cambiarRuta() {
+  if (location.hash === '#app') { enfocar($('#app')); return; }
   const ruta = obtenerRuta();
   if (ruta.name !== 'login' && location.hash.slice(1) !== returnTo) favoritoPendiente = null;
   page = 1;
   helpCategory = '';
   filters = crearFiltrosIniciales();
-  mostrarPagina();
+  filtrosAbiertos = null;
+  mostrarPagina(false);
+  enfocarTitulo();
   window.scrollTo(0, 0);
 }
 

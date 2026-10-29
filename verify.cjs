@@ -17,6 +17,9 @@ const element = (s) => {
         },
       },
       setAttribute() {},
+      getAttribute() { return null; },
+      removeAttribute() {},
+      focus() {},
       value: '',
     });
   return elements.get(s);
@@ -35,9 +38,10 @@ const context = vm.createContext({
   document: {
     querySelector: element,
     querySelectorAll: () => [],
+    getElementById: () => null,
     addEventListener: (type, fn) => (listeners[type] = fn),
   },
-  window: { addEventListener() {}, scrollTo() {} },
+  window: { addEventListener() {}, scrollTo() {}, matchMedia: () => ({ matches: true }) },
   FormData: class {
     constructor(f) {
       return new Map(Object.entries(f.values));
@@ -53,6 +57,7 @@ const scripts = [
   'js/compras.js',
   'js/cuenta.js',
   'js/ayuda.js',
+  'js/accesibilidad.js',
   'js/acciones.js',
   'app.js',
 ];
@@ -105,7 +110,7 @@ assert.equal(run('Object.keys(provinceCities).length'), 24);
 assert(/required\s+disabled/.test(run('crearUbicacion()')));
 async function submit(type, values) {
   await listeners.submit({
-    target: { dataset: { form: type }, reportValidity: () => true, values },
+    target: { dataset: { form: type }, reportValidity: () => true, querySelectorAll: () => [], values },
     preventDefault() {},
   });
 }

@@ -14,7 +14,7 @@ function mostrarInicio() {
       .map(
         ([n, img]) => html`
           <a class="category" href="#categoria?tipo=${n}">
-            <img src="${img}" alt="${n}" loading="lazy" />
+            <img src="${img}" alt="" loading="lazy" />
             <span>${n === 'Tradicionales' ? 'Productos tradicionales' : n} ↗</span>
           </a>
         `,
@@ -47,7 +47,8 @@ function mostrarInicio() {
       .map(
         ([n, t]) => html`
           <article class="panel">
-            <div class="stars" aria-label="5 de 5 estrellas">★★★★★</div>
+            <div class="stars" aria-hidden="true">★★★★★</div>
+            <p class="rating-text">5 de 5 estrellas</p>
             <p>“${t}”</p>
             <strong>${n}</strong>
             <p class="small-text">Amante del café</p>
@@ -132,6 +133,7 @@ function mostrarCatalogo(r) {
                       class="chip ${filters.presentation === n ? 'active' : ''}"
                       data-action="subcategory"
                       data-value="${n}"
+                      aria-pressed="${filters.presentation === n}"
                     >
                       ${n}
                     </button>
@@ -170,7 +172,7 @@ function mostrarCatalogo(r) {
       ? crearCuadricula(list.slice((page - 1) * 9, page * 9))
       : html`
           <div class="empty">
-            <div class="big-icon">⌕</div>
+            <div class="big-icon" aria-hidden="true">⌕</div>
             <h2>No encontramos productos</h2>
             <p>Prueba otra búsqueda o explora nuestro catálogo.</p>
             <button class="btn" data-action="reset-catalog">Ver todos los productos</button>
@@ -195,6 +197,7 @@ function mostrarCatalogo(r) {
                   data-action="page"
                   data-value="${i + 1}"
                   aria-label="Página ${i + 1}"
+                  ${page === i + 1 ? 'aria-current="page"' : ''}
                 >
                   ${i + 1}
                 </button>
@@ -509,14 +512,14 @@ function mostrarNosotros() {
     proceso: ['Cultivo', 'Recolección', 'Selección', 'Tostado', 'Tu taza']
       .map(
         (n, i) => html`
-          <span>
+          <li>
             <small>0${i + 1}</small>
             <br />
             <strong>${n}</strong>
-          </span>
+          </li>
         `,
       )
-      .join('<span aria-hidden="true">→</span>'),
+      .join(''),
     valores: [
       ['Tradición', 'Sabores con memoria.'],
       ['Calidad', 'Atención en cada selección.'],

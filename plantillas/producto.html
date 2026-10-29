@@ -8,10 +8,8 @@
     <div>
       <div class="eyebrow">{{origen}} · SELECCIÓN MERCADILLO</div>
       <h1>{{nombre}}</h1>
-      <div class="stars">
-        ★★★★★
-        <span class="demo-note">Reseñas de demostración</span>
-      </div>
+      <div class="stars" aria-hidden="true">★★★★★</div>
+      <p class="demo-note">Valoración ilustrativa: 5 de 5 estrellas.</p>
       <div class="price product-unit-price" id="unit-price">{{precioUnitario}}</div>
       <p id="price-description" class="price-description">
         Precio por unidad según presentación y peso.
@@ -51,22 +49,26 @@
         <button class="btn" data-action="add-detail" data-id="{{idCompra}}" {{estadoCompra}}>
           Añadir al carrito →
         </button>
-        <button class="btn secondary" data-action="favorite" data-id="{{idFavorito}}">
+        <button class="btn secondary" data-action="favorite" data-id="{{idFavorito}}" aria-pressed="false">
           {{textoFavorito}}
         </button>
       </div>
       <p class="demo-note">Envíos nacionales · Producto seleccionado · Compra de demostración</p>
     </div>
   </section>
-  <section class="section">{{caracteristicas}}</section>
+  <section class="section" aria-labelledby="product-info-title">
+    <h2 id="product-info-title">Información del producto</h2>
+    {{caracteristicas}}
+  </section>
   {{perfilCafe}}
   <section class="section">
     <div class="section-head">
       <h2>Opiniones</h2>
-      <button class="btn secondary" data-action="review">Escribir opinión</button>
+      <button class="btn secondary" data-action="review" aria-controls="review-form" aria-expanded="false">Escribir opinión</button>
     </div>
     <div class="panel">
-      <div class="stars">★★★★★</div>
+      <div class="stars" aria-hidden="true">★★★★★</div>
+      <p class="rating-text">5 de 5 estrellas</p>
       <p>“Excelente aroma para empezar el día.”</p>
       <strong>María P.</strong>
       <p class="demo-note">Opinión ilustrativa.</p>

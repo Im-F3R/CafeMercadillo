@@ -1,0 +1,12 @@
+{
+  "name": "cafe-mercadillo",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node server.cjs",
+    "test": "node verify.cjs && node verificar-accesibilidad.cjs"
+  },
+  "devDependencies": {
+    "jsdom": "30.1.3"
+  }
+}

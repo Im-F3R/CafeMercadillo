@@ -16,8 +16,11 @@ El checkout valida correo con dominio, teléfono de 10 dígitos y selección obl
 
 Comprobaciones: `node verify.cjs` y `node --check app.js`.
 
+Para ejecutar también las pruebas de accesibilidad con DOM: `npm install` y `npm test`. Se necesita Node.js 22.22.2, 24.15.0 o superior compatible con JSDOM. La tienda y su servidor local no dependen de JSDOM.
+
 - index.html: entrada principal.
 - styles.css: sistema visual y diseño adaptable.
+- accesibilidad.css: tipografía, reflujo, foco, errores y estados sin cambiar la paleta.
 - app.js: inicio de la aplicación, carga de plantillas y navegación.
 - plantillas/: HTML separado y con sangría para cada vista y componente.
 - js/datos.js: registros de productos, preguntas y ubicaciones.
@@ -29,6 +32,8 @@ Comprobaciones: `node verify.cjs` y `node --check app.js`.
 - js/cuenta.js: vistas de registro, acceso y perfil.
 - js/ayuda.js: preguntas frecuentes y vista de ayuda.
 - js/acciones.js: funciones de cada acción y eventos de formularios y botones.
+- js/accesibilidad.js: conservación del foco, mensajes, validación contextual y paneles accesibles.
+- ACCESIBILIDAD.md: matriz de las 43 observaciones del informe y alcance de las pruebas.
 - favicon.svg: icono de marca.
 - server.cjs: servidor local opcional, sin paquetes externos.
 
