@@ -359,8 +359,8 @@ const logo = html`
       <path d="M8 15h25v12a11 11 0 0 1-22 0V15m22 3h3a6 6 0 0 1 0 12h-4M8 40h27M17 3v7m9-7v7" />
     </svg>
     <span>
-      <b>Café Mercadillo</b>
-      <small>DE LOJA, CON ORGULLO</small>
+      <span class="logo-name">Café Mercadillo</span>
+      <span class="logo-tagline">DE LOJA, CON ORGULLO</span>
     </span>
   </a>
 `;

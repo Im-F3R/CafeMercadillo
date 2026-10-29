@@ -51,8 +51,9 @@ function mostrarEncabezado() {
     contenido3: simple
       ? ''
       : html`
-          <a class="icon" href="#busqueda" aria-label="Buscar">${icon('search')}</a>
+          <a class="icon" href="#busqueda" aria-label="Buscar">${icon('search')}<span class="sr-only">Buscar</span></a>
           <a class="icon" href="#favoritos" aria-label="Favoritos">
+            <span class="sr-only">Favoritos</span>
             ${icon('heart')}${
               favorites.length
                 ? html`
@@ -62,6 +63,7 @@ function mostrarEncabezado() {
             }
           </a>
           <a class="icon" href="#${profile ? 'cuenta' : 'login'}" aria-label="Mi cuenta">
+            <span class="sr-only">Mi cuenta</span>
             ${icon('user')}
           </a>
         `,

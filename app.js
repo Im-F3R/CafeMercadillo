@@ -36,7 +36,7 @@ function mostrarPagina(conservarFoco = true) {
   restaurarFoco(focoAnterior);
   $('#app').setAttribute('aria-busy', 'false');
   const titulos = {
-    inicio: 'El sabor de nuestra tierra',
+    inicio: 'Café de origen y productos lojanos',
     tienda: 'Nuestra tienda',
     categoria: 'Productos de Loja',
     busqueda: 'Buscar',

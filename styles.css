@@ -98,13 +98,13 @@ header {
   gap: 12px;
   align-items: center;
 }
-.logo b {
+.logo-name {
   font:
     22px 'Playfair Display',
     serif;
   display: block;
 }
-.logo small {
+.logo-tagline {
   font-size: 0.875rem;
   letter-spacing: 3px;
 }
@@ -340,7 +340,7 @@ p {
     sans-serif;
   margin: 8px 0;
 }
-.product small {
+.product-meta {
   font-size: 0.875rem;
   letter-spacing: 1px;
   color: var(--muted);
@@ -840,7 +840,7 @@ select:disabled {
   .navlinks a {
     font-size: 0.875rem;
   }
-  .logo b {
+  .logo-name {
     font-size: 18px;
   }
   .grid {
@@ -1109,7 +1109,7 @@ select:disabled {
   letter-spacing: 0.12em;
 }
 
-.product small,
+.product-meta,
 .product .btn {
   font-size: 0.75rem;
 }
