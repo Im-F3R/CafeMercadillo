@@ -15,7 +15,7 @@ function crearResumen(mostrarPago = false) {
           .map(
             (c) => html`
               <div class="sumrow">
-                <span>${products.find((p) => p.id === c.id).name} × ${c.qty}</span>
+                <span>${escaparTexto(buscarProducto(c.id)?.name || 'Producto')} × ${c.qty}</span>
                 <span>${formatearPrecio(precioLinea(c) * c.qty)}</span>
               </div>
             `,
@@ -32,11 +32,7 @@ function crearResumen(mostrarPago = false) {
           <div class="buttons">
             ${crearBoton('Continuar al pago →', 'checkout')}${crearBoton('Seguir comprando', 'tienda', true)}
           </div>
-          <form data-form="coupon" class="searchbar spaced-panel">
-            <input name="code" aria-label="Código de descuento" placeholder="Código de descuento" />
-            <button class="btn secondary">Aplicar</button>
-          </form>
-          <p class="demo-note">Prueba LOJA10 para un 10% de descuento.</p>
+          <p class="demo-note">Los precios y existencias se confirman al registrar el pedido.</p>
         `,
   });
 }
@@ -62,16 +58,16 @@ function mostrarCarrito() {
                   const p = buscarProducto(c.id);
                   return html`
                     <article class="cart-row">
-                      <img src="${p.image}" alt="${p.name}" />
+                      <img src="${escaparTexto(p.image)}" alt="${escaparTexto(p.name)}" />
                       <div class="info">
                         <h3 class="cart-product-title">
-                          <a href="#producto?id=${p.id}">${p.name}</a>
+                          <a href="#producto?id=${p.id}">${escaparTexto(p.name)}</a>
                         </h3>
                         <p class="cart-product-description">
                           ${escaparTexto(c.presentation)} ·
                           ${escaparTexto(c.weight || p.weight)}${c.grind ? ' · ' + escaparTexto(c.grind) : ''}
                         </p>
-                        <button class="chip" data-action="remove-cart" data-index="${i}" aria-label="Eliminar ${p.name}, ${escaparTexto(c.weight || p.weight)}, ${escaparTexto(c.presentation)}">
+                        <button class="chip" data-action="remove-cart" data-index="${i}" aria-label="Eliminar ${escaparTexto(p.name)}, ${escaparTexto(c.weight || p.weight)}, ${escaparTexto(c.presentation)}">
                           Eliminar
                         </button>
                       </div>
@@ -80,7 +76,7 @@ function mostrarCarrito() {
                           data-action="quantity"
                           data-index="${i}"
                           data-value="-1"
-                          aria-label="Reducir cantidad de ${p.name}, ${escaparTexto(c.weight || p.weight)}, ${escaparTexto(c.presentation)}"
+                          aria-label="Reducir cantidad de ${escaparTexto(p.name)}, ${escaparTexto(c.weight || p.weight)}, ${escaparTexto(c.presentation)}"
                         >
                           −
                         </button>
@@ -89,7 +85,7 @@ function mostrarCarrito() {
                           data-action="quantity"
                           data-index="${i}"
                           data-value="1"
-                          aria-label="Aumentar cantidad de ${p.name}, ${escaparTexto(c.weight || p.weight)}, ${escaparTexto(c.presentation)}"
+                          aria-label="Aumentar cantidad de ${escaparTexto(p.name)}, ${escaparTexto(c.weight || p.weight)}, ${escaparTexto(c.presentation)}"
                         >
                           +
                         </button>
@@ -107,6 +103,7 @@ function mostrarCarrito() {
 }
 
 function mostrarPago() {
+  if (!profile) return plantilla('cuenta-vacio', { contenido1: crearBoton('Iniciar sesión para comprar', 'login') });
   if (!cart.length) return mostrarCarrito();
   return plantilla('pago', {
     ruta: crearRuta('Carrito / Pago'),
@@ -118,6 +115,7 @@ function mostrarPago() {
     direccion: crearCampo('Dirección', 'address'),
     referencia: crearCampo('Referencia', 'reference', 'text', '', false),
     resumen: crearResumen(true),
+    metodos: metodosPago.map((m, indice) => `<label class="radio-option"><input type="radio" name="payment" value="${escaparTexto(m.met_codigo__)}" ${indice === 0 ? 'checked' : ''} required>${escaparTexto(m.met_nombre__)}</label>`).join(''),
   });
 }
 
@@ -142,15 +140,15 @@ function crearDetallePedido(o) {
     numero: escaparTexto(o.number),
     estado: escaparTexto(o.status),
     fecha: new Date(o.date).toLocaleDateString('es-EC'),
-    pago: escaparTexto(o.payment),
+    pago: escaparTexto(o.payment) + ' · Estado del pago: ' + escaparTexto(o.paymentStatus || 'PENDIENTE'),
     productos: o.items
       .map((c) => {
-        const p = buscarProducto(c.id);
+        const p = c.name ? { name: c.name, image: c.image, weight: c.weight } : buscarProducto(c.id) || { name: 'Producto', image: 'favicon.svg', weight: '' };
         return html`
           <div class="cart-row">
-            <img src="${p.image}" alt="${p.name}" />
+            <img src="${escaparTexto(p.image)}" alt="${escaparTexto(p.name)}" />
             <div class="info">
-              <strong>${p.name}</strong>
+              <strong>${escaparTexto(p.name)}</strong>
               <p>
                 ${escaparTexto(c.presentation)} · ${escaparTexto(c.weight || p.weight)} · Cantidad:
                 ${c.qty}
@@ -164,7 +162,7 @@ function crearDetallePedido(o) {
     direccion: escaparTexto(o.address),
     ciudad: escaparTexto(o.city),
     total: formatearPrecio(o.total),
-    progreso: crearProgresoPedido(o.status),
+    progreso: crearProgresoPedido(o.status) + (o.tracking?.length ? '<ul>' + o.tracking.map((t) => '<li>' + escaparTexto(t.fecha) + ': ' + escaparTexto(t.estado) + '</li>').join('') + '</ul>' : ''),
   });
 }
 
@@ -264,42 +262,22 @@ function mostrarPedidos(r) {
 }
 
 function mostrarSeguimiento(r) {
+  if (!profile) return plantilla('cuenta-vacio', { contenido1: crearBoton('Iniciar sesión para consultar pedidos', 'login') });
   return html`
       <div class="wrap narrow">
       ${crearRuta('Consultar pedido')}
       <h1 class="page-title">Consulta tu pedido</h1>
       <p>
-        No necesitas una cuenta. Ingresa el número de pedido y el correo que utilizaste al comprar.
+        Consulta los pedidos de tu cuenta mediante su número y tu correo.
       </p>
       <form class="panel" data-form="tracking">
         ${crearCampo('Número de pedido', 'number', 'text', r.params.get('id') || '')}
         ${crearCampo('Correo de la compra', 'email', 'email')}
         <button class="btn full" type="submit">Consultar estado</button>
       </form>
-      <p class="demo-note">Los pedidos de prueba se consultan en el mismo navegador donde se realizó la compra.</p>
+      <p class="demo-note">Tus pedidos se guardan en tu cuenta y se pueden consultar desde otros dispositivos.</p>
       <p id="tracking-status" role="status" aria-live="polite" aria-atomic="true"></p>
       <div id="tracking-result"></div>
       </div>
   `;
-}
-
-function agregarAlCarrito(id, qty = 1, presentation, grind = '', weight) {
-  const p = products.find((p) => p.id === Number(id));
-  if (!p?.stock) return;
-  qty = Math.min(99, Math.max(1, Number(qty) || 1));
-  presentation = presentation || p.presentation;
-  weight = weight || p.weight;
-  const unitPrice = calcularPrecioVariante(p, presentation, weight);
-  const existing = cart.find(
-    (c) =>
-      c.id === p.id &&
-      c.presentation === presentation &&
-      c.grind === grind &&
-      (c.weight || p.weight) === weight,
-  );
-  if (existing) existing.qty = Math.min(99, existing.qty + qty);
-  else cart.push({ id: p.id, qty, presentation, grind, weight, unitPrice });
-  guardarDatos();
-  mostrarEncabezado();
-  mostrarMensaje(`${p.name} añadido al carrito`);
 }

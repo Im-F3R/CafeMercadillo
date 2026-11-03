@@ -18,7 +18,7 @@ http
       res.end('No encontrado');
       return;
     }
-    fs.readFile(path.join(__dirname, name), (err, data) => {
+    fs.readFile(path.join(__dirname, 'dist', name), (err, data) => {
       if (err) {
         res.writeHead(500);
         res.end('Error al leer el archivo');

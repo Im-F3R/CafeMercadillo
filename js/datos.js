@@ -329,7 +329,7 @@ const legacyProducts = [
 
 const products = legacyProducts.filter((p) => p.id !== 4);
 
-const buscarProducto = (id) => legacyProducts.find((p) => p.id === Number(id));
+const buscarProducto = (id) => products.find((p) => String(p.id) === String(id));
 
 const icons = {
   search: '<circle cx="10" cy="10" r="6"/><path d="m15 15 5 5"/>',
@@ -416,7 +416,7 @@ const faqs = [
   [
     'Compras',
     '¿Cómo puedo rastrear mi pedido?',
-    'Sin cuenta, usa Consultar un pedido con el número y correo de la compra. Con cuenta, también puedes usar Mis pedidos. En esta demostración la consulta funciona en el navegador donde compraste.',
+    'Inicia sesión y entra en Mis pedidos. Los pedidos de tu cuenta están disponibles desde cualquier dispositivo.',
   ],
   [
     'Devoluciones',
@@ -426,16 +426,16 @@ const faqs = [
   [
     'Cuenta',
     '¿Cómo guardo mis favoritos?',
-    'Inicia sesión y pulsa el corazón de un producto. Tus favoritos se guardan por cuenta en este navegador.',
+    'Inicia sesión y pulsa el corazón de un producto. Tus favoritos se guardan en tu cuenta y están disponibles desde otros dispositivos.',
   ],
   [
     'Compras',
     '¿Cómo aplico un descuento?',
-    'Usa el código LOJA10 en el carrito para probar un descuento del 10%.',
+    'Actualmente no hay cupones habilitados.',
   ],
   [
     'Cuenta',
     'Términos y privacidad de la demostración',
-    'La tienda no realiza ventas reales. Carrito, perfil, direcciones y pedidos se guardan únicamente en este navegador. No introduzcas datos sensibles ni contraseñas reales.',
+    'La tienda no realiza ventas reales. Carrito, perfil, direcciones y pedidos se almacenan en Supabase y se asocian a tu cuenta. La autenticación utiliza Supabase Auth.',
   ],
 ];

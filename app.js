@@ -20,6 +20,7 @@ function mostrarPagina(conservarFoco = true) {
     checkout: mostrarPago,
     confirmacion: mostrarConfirmacion,
     login: mostrarAcceso,
+    recuperar: mostrarRecuperacion,
     cuenta: () => mostrarCuenta(),
     direcciones: () => mostrarCuenta(true),
     pedidos: () => mostrarPedidos(ruta),
@@ -33,6 +34,7 @@ function mostrarPagina(conservarFoco = true) {
   actualizarCategoriasAyuda();
   prepararAccesibilidad();
   actualizarResumenAyuda();
+  cargarOpinionesRemotas();
   restaurarFoco(focoAnterior);
   $('#app').setAttribute('aria-busy', 'false');
   const titulos = {
@@ -45,6 +47,7 @@ function mostrarPagina(conservarFoco = true) {
     checkout: 'Compra segura',
     confirmacion: 'Gracias por tu compra',
     login: 'Tu cuenta',
+    recuperar: 'Recuperar acceso',
     cuenta: 'Mi perfil',
     direcciones: 'Direcciones',
     pedidos: 'Mis pedidos',
@@ -71,7 +74,7 @@ function cambiarRuta() {
 
 async function iniciarAplicacion() {
   try {
-    await cargarPlantillas();
+    await Promise.all([cargarPlantillas(), conectarTienda()]);
     mostrarPagina();
   } catch (error) {
     $('#app').setAttribute('aria-busy', 'false');

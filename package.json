@@ -3,10 +3,16 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "node server.cjs",
-    "test": "node verify.cjs && node verificar-accesibilidad.cjs"
+    "start": "npm run build && node server.cjs",
+    "test": "node tests/base-datos.cjs && node tests/interfaz.cjs",
+    "build": "node scripts/build.cjs"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.5.14",
+    "esbuild": "^0.28.2",
     "jsdom": "30.1.3"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.118.0"
   }
 }

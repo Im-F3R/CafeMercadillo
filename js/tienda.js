@@ -234,33 +234,33 @@ function mostrarCatalogo(r) {
 }
 
 function mostrarProducto(id) {
-  const p = products.find((p) => p.id === Number(id));
+  const p = buscarProducto(id);
   if (!p)
     return plantilla('producto-vacio', { contenido1: crearBoton('Volver a la tienda', 'tienda') });
   return plantilla('producto', {
     ruta: crearRuta(html`
-      <a href="#categoria?tipo=${p.category}">${p.category}</a>
-      / ${p.name}
+      <a href="#categoria?tipo=${encodeURIComponent(p.category)}">${escaparTexto(p.category)}</a>
+      / ${escaparTexto(p.name)}
     `),
-    imagen: p.image,
-    nombreImagen: p.name,
+    imagen: escaparTexto(p.image),
+    nombreImagen: escaparTexto(p.name),
     miniaturas: [p.image, imgs.cup, imgs.beans]
       .map(
         (im, i) => html`
-          <button data-action="gallery" data-src="${im}" aria-label="Ver fotografía ${i + 1}">
-            <img src="${im}" alt="Vista ${i + 1}" loading="lazy" />
+            <button data-action="gallery" data-src="${escaparTexto(im)}" aria-label="Ver fotografía ${i + 1}">
+            <img src="${escaparTexto(im)}" alt="Vista ${i + 1}" loading="lazy" />
           </button>
         `,
       )
       .join(''),
-    origen: p.origin,
-    nombre: p.name,
+    origen: escaparTexto(p.origin),
+    nombre: escaparTexto(p.name),
     precioUnitario: formatearPrecio(p.price),
     disponibilidad: p.stock ? '● Disponible' : 'Agotado temporalmente',
-    presentaciones: (p.category === 'Café' ? ['Molido', 'En grano'] : ['Unidad'])
+    presentaciones: (p.variants ? [...new Set(p.variants.map((v) => v.presentation))] : p.category === 'Café' ? ['Molido', 'En grano'] : ['Unidad'])
       .map((v) => html` <option>${v}</option> `)
       .join(''),
-    pesos: (p.category === 'Café' ? ['250 g', '450 g', '900 g'] : [p.weight])
+    pesos: (p.variants ? [...new Set(p.variants.map((v) => v.weight))] : p.category === 'Café' ? ['250 g', '450 g', '900 g'] : [p.weight])
       .map((w) => html` <option>${w}</option> `)
       .join(''),
     molienda:
@@ -292,6 +292,12 @@ function mostrarProducto(id) {
 }
 
 function informacionProducto(producto) {
+  if (producto.description) {
+    const titulos = ['Descripción', 'Origen', 'Características', 'Preparación recomendada', 'Conservación'];
+    const ids = ['descripcion', 'origen', 'caracteristicas', 'preparacion', 'conservacion'];
+    return titulos.map((titulo, indice) => ({ id: ids[indice], titulo,
+      texto: producto.description.split('\n').find((linea) => linea.startsWith(titulo + ':'))?.slice(titulo.length + 1).trim() || (indice === 0 ? producto.description : 'Consulta las indicaciones del producto.') }));
+  }
   return [
     {
       id: 'descripcion',
@@ -423,6 +429,7 @@ function crearPerfilCafe() {
 }
 
 function calcularPrecioVariante(p, presentation = p.presentation, weight = p.weight) {
+  if (p.variants) return buscarVariante(p, presentation, weight, $('#grind')?.value)?.price ?? 0;
   const multiplier = { '250 g': 1, '450 g': 1.8, '900 g': 3.6 };
   return (
     Math.round(
@@ -461,6 +468,16 @@ function actualizarSeleccion() {
     grind.disabled = presentation === 'En grano';
     if (grind.disabled) grind.value = 'Sin molienda';
     else if (grind.value === 'Sin molienda') grind.value = 'Media · filtrado';
+  }
+  if (p.variants) {
+    const variante = buscarVariante(p, presentation, weight, grind?.value);
+    const precio = variante?.price;
+    $('#unit-price').textContent = precio == null ? 'No disponible' : formatearPrecio(precio);
+    $('#selection-total').textContent = precio == null ? '—' : formatearPrecio(precio * cantidad);
+    const boton = $('[data-action="add-detail"]');
+    if (boton) boton.disabled = !variante || precio == null || (variante.stock || 0) < cantidad;
+    const disponibilidad = $('.detail .stock');
+    if (disponibilidad) disponibilidad.textContent = !variante ? 'Presentación no disponible' : variante.stock === null ? 'Disponibilidad por confirmar' : variante.stock > 0 ? `${variante.stock} disponibles` : 'Agotado temporalmente';
   }
 }
 

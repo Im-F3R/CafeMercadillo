@@ -58,7 +58,7 @@ function mostrarCuenta(address = false) {
           <form class="panel hidden spaced-panel" id="address-form" data-form="address">
             <input type="hidden" name="index" value="-1" />
             <div class="fields">
-              ${crearCampo('Dirección', 'address')}${crearCampo('Ciudad', 'city')}${crearCampo('Referencia', 'reference', 'text', '', false)}
+              ${crearCampo('Dirección', 'address')}${crearUbicacion()}${crearCampo('Referencia', 'reference', 'text', '', false)}
             </div>
             <button class="btn full">Guardar dirección</button>
           </form>
@@ -68,16 +68,11 @@ function mostrarCuenta(address = false) {
             <h2>Mi perfil</h2>
             <form data-form="profile">
               <div class="fields">
-                ${crearCampo('Nombre', 'name', 'text', profile.name)}${crearCampo('Apellido', 'surname', 'text', profile.surname || '')}${crearCampo('Correo', 'email', 'email', profile.email)}${crearCampo('Teléfono', 'phone', 'tel', profile.phone || '', false)}
+                ${crearCampo('Nombre', 'name', 'text', profile.name)}${crearCampo('Apellido', 'surname', 'text', profile.surname || '')}${crearCampo('Correo de acceso', 'email', 'email', profile.email).replace('<input ', '<input readonly ')}${crearCampo('Teléfono', 'phone', 'tel', profile.phone || '', false)}
               </div>
               <button class="btn save-profile-button">Guardar información</button>
             </form>
           </div>
         `,
   });
-}
-
-async function resumirContrasena(password) {
-  const bytes = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(password));
-  return Array.from(new Uint8Array(bytes), (b) => b.toString(16).padStart(2, '0')).join('');
 }
