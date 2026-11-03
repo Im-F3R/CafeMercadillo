@@ -7,7 +7,7 @@ const types = {
   '.js': 'text/javascript; charset=utf-8',
   '.svg': 'image/svg+xml',
 };
-const files = new Set(['index.html', 'styles.css', 'accesibilidad.css', 'app.js', 'favicon.svg']);
+const files = new Set(['styles.css', 'accesibilidad.css', 'app.js', 'favicon.svg', ...fs.readdirSync(path.join(__dirname, 'dist')).filter((nombre) => /^[a-z-]+\.html$/.test(nombre))]);
 http
   .createServer((req, res) => {
     const name = new URL(req.url, 'http://localhost').pathname.slice(1) || 'index.html';

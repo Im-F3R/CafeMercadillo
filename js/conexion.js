@@ -105,8 +105,11 @@ async function operacionRemota(accion, datos) {
 
 function solicitarSesion(destino) {
   if (profile) return true;
-  returnTo = destino || location.hash.slice(1) || 'cuenta';
-  location.hash = 'login';
+  const ruta = obtenerRuta();
+  returnTo = destino || ruta.name + (location.search || '');
+  sessionStorage.setItem('mercadillo-retorno', returnTo);
+  sessionStorage.setItem('mercadillo-favorito-pendiente', JSON.stringify(favoritoPendiente));
+  irA('login');
   mostrarMensaje('Inicia sesión para continuar');
   return false;
 }
@@ -128,10 +131,10 @@ async function conectarTienda() {
   const { data, error } = await baseDatos.auth.getSession();
   if (error) throw error;
   if (data.session) await cargarCuentaRemota();
-  if (data.session && recuperando) location.hash = 'recuperar';
+  if (data.session && recuperando) irA('recuperar');
   baseDatos.auth.onAuthStateChange((evento) => {
     if (evento === 'PASSWORD_RECOVERY') {
-      setTimeout(() => { location.hash = 'recuperar'; mostrarPagina(); }, 0);
+      setTimeout(() => irA('recuperar'), 0);
     }
     if (evento === 'SIGNED_OUT') {
       profile = null; favorites = []; cart = []; orders = []; addresses = []; lastOrder = null;
@@ -164,7 +167,8 @@ async function accesoRemoto(datos, formulario) {
   if (producto) await operacionRemota('favorito', { producto: producto.code, guardar: true });
   favoritoPendiente = null;
   sessionStorage.removeItem('mercadillo-favorito-pendiente');
-  location.hash = returnTo;
+  sessionStorage.removeItem('mercadillo-retorno');
+  irA(returnTo);
   returnTo = 'cuenta';
   mostrarPagina();
   mostrarMensaje('Sesión iniciada');
@@ -201,7 +205,7 @@ async function pedidoRemoto(datos, formulario) {
   lastOrder = orders.find((o) => o.number === resultado.pedido);
   solicitudPedido = null;
   await cargarCatalogoRemoto();
-  location.hash = 'confirmacion';
+  irA('confirmacion?id=' + encodeURIComponent(resultado.pedido));
 }
 
 async function cargarOpinionesRemotas() {
@@ -226,7 +230,7 @@ Object.assign(acciones, {
   'add-detail': (b) => { if ($('#product-qty').reportValidity()) return agregarRemoto(b.dataset.id, $('#product-qty').value, $('#presentation').value, $('#weight').value, $('#grind')?.value); },
   quantity: async (b) => { const c = cart[Number(b.dataset.index)]; await operacionRemota('carrito', { presentacion: c.variant, cantidad: Math.max(0, c.qty + Number(b.dataset.value)) }); mostrarPagina(); },
   'remove-cart': async (b) => { await operacionRemota('carrito', { presentacion: cart[Number(b.dataset.index)].variant, cantidad: 0 }); mostrarPagina(); },
-  logout: async () => { const { error } = await baseDatos.auth.signOut(); if (error) throw error; location.hash = 'login'; },
+  logout: async () => { const { error } = await baseDatos.auth.signOut(); if (error) throw error; irA('login'); },
   'delete-address': async (b) => { await operacionRemota('eliminar_direccion', { codigo: addresses[Number(b.dataset.index)].code }); mostrarPagina(); },
   recover: async () => {
     const correo = document.querySelector('[name="email"]');
@@ -260,5 +264,5 @@ Object.assign(formularios, {
     await operacionRemota('opinion', { producto: buscarProducto(obtenerRuta().params.get('id')).code, calificacion: d.rating, comentario: d.review });
     mostrarPagina();
   },
-  password: async (d) => { const { error } = await baseDatos.auth.updateUser({ password: d.password }); if (error) throw error; location.hash = 'cuenta'; mostrarMensaje('Contraseña actualizada'); },
+  password: async (d) => { const { error } = await baseDatos.auth.updateUser({ password: d.password }); if (error) throw error; irA('cuenta'); },
 });

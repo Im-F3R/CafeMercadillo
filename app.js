@@ -1,8 +1,8 @@
 'use strict';
 
 function obtenerRuta() {
-  const [name, query] = (location.hash.slice(1) || 'inicio').split('?');
-  return { name, params: new URLSearchParams(query || '') };
+  const archivo = location.pathname.split('/').pop().replace(/\.html$/, '');
+  return { name: !archivo || archivo === 'index' ? 'inicio' : archivo, params: new URLSearchParams(location.search) };
 }
 
 function mostrarPagina(conservarFoco = true) {
@@ -62,7 +62,6 @@ function mostrarPagina(conservarFoco = true) {
 function cambiarRuta() {
   if (location.hash === '#app') { enfocar($('#app')); return; }
   const ruta = obtenerRuta();
-  if (ruta.name !== 'login' && location.hash.slice(1) !== returnTo) favoritoPendiente = null;
   page = 1;
   helpCategory = '';
   filters = crearFiltrosIniciales();
@@ -76,6 +75,7 @@ async function iniciarAplicacion() {
   try {
     await Promise.all([cargarPlantillas(), conectarTienda()]);
     mostrarPagina();
+    document.documentElement.dataset.conexion = 'lista';
   } catch (error) {
     $('#app').setAttribute('aria-busy', 'false');
     $('#app').innerHTML = html`
@@ -90,7 +90,6 @@ async function iniciarAplicacion() {
   }
 }
 
-window.addEventListener('hashchange', cambiarRuta);
 
 async function cargarPlantillas() {
   const archivos = [

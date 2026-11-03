@@ -29,7 +29,7 @@ function alternarMenu(boton) {
 function limpiarFiltros(boton) {
   filters = crearFiltrosIniciales();
   page = 1;
-  if (boton.dataset.action === 'reset-catalog') location.hash = 'tienda';
+  if (boton.dataset.action === 'reset-catalog') irA('tienda');
   mostrarPagina();
   anunciarCatalogo();
 }
@@ -45,7 +45,7 @@ function cambiarSubcategoria(boton) {
   const categoria = boton.dataset.value;
   if (categoria === 'Especial' || categoria === 'Packs') {
     filters = crearFiltrosIniciales();
-    location.hash = 'busqueda?q=' + encodeURIComponent(categoria === 'Packs' ? 'Pack' : 'especial');
+    irA('busqueda?q=' + encodeURIComponent(categoria === 'Packs' ? 'Pack' : 'especial'));
     return;
   }
   filters.presentation = filters.presentation === categoria ? '' : categoria;
@@ -149,7 +149,7 @@ function aplicarFiltro(control) {
 function buscarProductos(datos) {
   filters = crearFiltrosIniciales();
   page = 1;
-  location.hash = 'busqueda?q=' + encodeURIComponent(datos.q.trim());
+  irA('busqueda?q=' + encodeURIComponent(datos.q.trim()));
   mostrarPagina();
 }
 
@@ -227,10 +227,10 @@ async function manejarClick(evento) {
     return;
   }
 
-  const enlace = evento.target.closest('a[href="#ayuda"]');
+  const enlace = evento.target.closest('a[href="ayuda.html"]');
   if (enlace && obtenerRuta().name === 'ayuda') {
     evento.preventDefault();
-    if (location.hash !== '#ayuda') location.hash = 'ayuda';
+    history.replaceState(null, '', 'ayuda.html');
     restablecerAyuda();
     window.scrollTo({ top: 0, behavior: 'smooth' });
     return;

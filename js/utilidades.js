@@ -2,19 +2,34 @@
 
 const plantillas = new Map();
 
+function urlPagina(ruta) {
+  const [nombre, consulta] = ruta.split('?');
+  const paginas = ['inicio', 'tienda', 'categoria', 'busqueda', 'producto', 'carrito', 'checkout', 'confirmacion', 'login', 'recuperar', 'cuenta', 'direcciones', 'pedidos', 'seguimiento', 'favoritos', 'nosotros', 'ayuda'];
+  const archivo = paginas.includes(nombre) ? (nombre === 'inicio' ? 'index' : nombre) : 'index';
+  return archivo + '.html' + (consulta ? '?' + consulta : '');
+}
+
+function irA(ruta) {
+  location.assign(urlPagina(ruta));
+}
+
+function enlacesPaginas(contenido) {
+  return contenido.replace(/href="#(?!app")([^"]+)"/g, (_, ruta) => `href="${urlPagina(ruta)}"`);
+}
+
 function html(fragmentos, ...valores) {
-  return fragmentos.reduce((resultado, texto, indice) => {
+  return enlacesPaginas(fragmentos.reduce((resultado, texto, indice) => {
     return resultado + texto + (valores[indice] ?? '');
-  }, '');
+  }, ''));
 }
 
 function plantilla(nombre, valores = {}) {
   const contenido = plantillas.get(nombre);
   if (contenido === undefined) throw new Error('No se ha cargado la plantilla ' + nombre);
 
-  return contenido.replace(/{{(\w+)}}/g, (coincidencia, clave) => {
+  return enlacesPaginas(contenido.replace(/{{(\w+)}}/g, (coincidencia, clave) => {
     return String(valores[clave] ?? '');
-  });
+  }));
 }
 
 const $ = (s) => document.querySelector(s),

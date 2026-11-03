@@ -47,7 +47,8 @@ async function probar() {
   assert.equal(run('products.length'), 1);
   assert.equal(run('products[0].price'), 17.25);
   assert.equal(run('products[0].stock'), false);
-  function navegar(ruta) { w.history.replaceState(null, '', '#' + ruta); run('cambiarRuta()'); }
+  run('irA = (ruta) => { history.replaceState(null, "", urlPagina(ruta)); }');
+  function navegar(ruta) { w.history.replaceState(null, '', run('urlPagina')(ruta)); run('cambiarRuta()'); }
   for (const ruta of ['inicio', 'tienda', 'producto?id=1', 'carrito', 'checkout', 'login', 'cuenta', 'direcciones', 'pedidos', 'favoritos', 'nosotros', 'ayuda', 'seguimiento']) {
     navegar(ruta);
     assert.equal(w.document.querySelectorAll('#app h1').length, 1, ruta);

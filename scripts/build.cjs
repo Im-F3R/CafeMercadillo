@@ -7,3 +7,4 @@ for (const archivo of ['index.html', 'styles.css', 'accesibilidad.css', 'app.js'
   fs.cpSync(path.resolve(__dirname, '..', archivo), path.join(salida, archivo), { recursive: true });
 }
 esbuild.buildSync({ entryPoints: [path.join(__dirname, 'sdk.js')], bundle: true, minify: true, outfile: path.join(salida, 'js/supabase-sdk.js'), platform: 'browser', format: 'iife' });
+require('./generar-paginas.cjs')(salida).catch((error) => { console.error(error); process.exitCode = 1; });

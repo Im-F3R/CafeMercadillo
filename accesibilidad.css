@@ -18,6 +18,13 @@ body {
   font-size: 1rem;
 }
 
+.hero .hero-note,
+.product .price-caption,
+.price-description {
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
 small {
   font-size: .875rem;
 }

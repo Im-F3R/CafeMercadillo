@@ -182,6 +182,7 @@ function crearProgresoPedido(estado) {
 }
 
 function mostrarConfirmacion() {
+  lastOrder = orders.find((o) => o.number === obtenerRuta().params.get('id')) || lastOrder;
   if (!lastOrder)
     return plantilla('confirmacion-vacio', {
       contenido1: crearBoton('Explorar productos', 'tienda'),
