@@ -2,8 +2,8 @@
 
 function mostrarInicio() {
   return plantilla('inicio', {
-    botonTienda: crearBoton('Comprar ahora →', 'tienda'),
-    botonHistoria: crearBoton('Conocer nuestra historia', 'nosotros', true),
+    botonTienda: crearBoton('Comprar ahora', 'tienda'),
+    botonHistoria: crearBoton('Conoce nuestra historia', 'nosotros', true),
     imagenPortada: imgs.cup,
     categorias: [
       ['Café', imgs.beans],

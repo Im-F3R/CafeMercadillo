@@ -168,7 +168,7 @@ async function submit(type, values) {
   assert.equal(run('helpCategory'), '');
   assert(element('#faq-list').innerHTML.includes('¿Cuánto demora el envío?'));
   const htmlInicio = run('mostrarInicio()');
-  assert(htmlInicio.includes('Un poquito de Loja.'));
+  assert(htmlInicio.includes('Porque con cada taza, te llevamos a sentirte como en Loja'));
   assert(!htmlInicio.includes('{{'));
   for (const ruta of [
     'inicio',
