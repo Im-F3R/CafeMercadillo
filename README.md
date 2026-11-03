@@ -40,3 +40,9 @@ El asesor de Supabase señala funciones SECURITY DEFINER intencionales y tablas 
 ## Navegación multipágina
 
 La compilación genera 17 documentos HTML independientes con contenido inicial y navegación mediante archivos .html. Los datos privados se cargan tras autenticar la cuenta. node tests/paginas.cjs valida documentos, títulos y destinos. Se conservaron los colores y los textos de precio y nota de portada se aumentaron a 1 rem.
+
+## Simulación de pago con tarjeta
+
+La migración supabase/migrations/20261103042200_simular_pago_tarjeta.sql habilita TARJDEMO y deshabilita PAYPAL. Debe aplicarse en Supabase para que aparezca la tarjeta en el checkout. La interfaz solo ofrece tarjeta si el catálogo remoto la devuelve como activa.
+
+La tarjeta es ficticia y está precargada; no hay campos para números bancarios o CVV. El selector permite aprobar o rechazar la simulación. Una aprobación registra PAGO y ORDEN_COBRO como SIMULADO, con referencia explícita sin cargo real. Un rechazo no crea pedido, no consume stock y conserva el carrito. Transferencia y contra entrega conservan el estado PENDIENTE. PayPal está deshabilitado en la interfaz y la función del servidor lo rechaza. Las pruebas de base de datos cubren los dos resultados, PayPal y reintentos sin duplicados.

@@ -18,7 +18,7 @@ async function probar() {
     producto: [{ prd_codigo__: 'P0000001', cat_codigo__: 'CAF', prd_nombre__: 'Café <img src=x onerror=alert(1)>', prd_descripcion__: 'Descripción: Café de prueba.\nOrigen: Origen de referencia: Alamor, provincia de Loja, Ecuador.\nCaracterísticas: Tostado medio, perfil equilibrado.', prd_imagen_url__: 'https://example.com/cafe.jpg', prd_iva_porcentaje__: 0 }],
     categoria: [{ cat_codigo__: 'CAF', cat_nombre__: 'Café' }],
     presentacion: [{ pre_codigo__: 'V0000101', prd_codigo__: 'P0000001', unm_codigo__: 'G', pre_cantidad__: 250, pre_molienda__: 'MOLIDO_MEDIA', pre_precio__: 17.25, pre_stock__: null }],
-    metodo_pago: [{ met_codigo__: 'TRANSF', met_nombre__: 'Transferencia bancaria' }],
+    metodo_pago: [{ met_codigo__: 'TRANSF', met_nombre__: 'Transferencia bancaria' }, { met_codigo__: 'TARJDEMO', met_nombre__: 'Tarjeta de prueba' }],
   };
   const cliente = {
     from: (nombre) => ({ select: () => ({ order: async () => ({ data: tabla[nombre] }), then: (resolve) => resolve({ data: tabla[nombre] }) }) }),
@@ -62,6 +62,18 @@ async function probar() {
   await run('accesoRemoto')({ email: 'cliente@example.test', password: 'correcta' }, null);
   assert.equal(run('favorites[0]'), 1);
   assert(llamadas.some((l) => l.parametros?.p_accion === 'favorito'));
+  run("cart = [lineaDesdeVariante('V0000101', 1)]");
+  navegar('checkout');
+  assert.equal(w.document.querySelector('[name="payment"]:checked').value, 'TARJDEMO');
+  assert(w.document.querySelector('[value="PAYPAL"]').disabled);
+  assert.equal(w.document.querySelector('#card-demo').hidden, false);
+  assert.equal(w.document.querySelector('[name="cardResult"]').value, 'APROBADO');
+  assert(w.document.querySelector('[form="checkout-form"]').textContent.includes('Simular pago'));
+  w.document.querySelector('[value="TRANSF"]').checked = true;
+  run('actualizarMetodoPago()');
+  assert(w.document.querySelector('#card-demo').disabled);
+  assert(w.document.querySelector('#card-demo').hidden);
+  assert(run("estadoPagoVisible('SIMULADO')").includes('Sin cargo real'));
   navegar('direcciones');
   assert(w.document.querySelector('[name="province"]'));
   await run('cargarOpinionesRemotas()');

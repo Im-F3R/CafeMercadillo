@@ -13,6 +13,7 @@ async function probar() {
     alter table public.usuario alter column usr_password_hash__ drop not null;`);
   await db.exec(fs.readFileSync('database/catalogo-demostracion.sql', 'utf8'));
   await db.exec(fs.readFileSync('database/002-integracion-tienda.sql', 'utf8'));
+  await db.exec(fs.readFileSync('supabase/migrations/20261103042200_simular_pago_tarjeta.sql', 'utf8'));
   await db.exec(`insert into auth.users values ('00000000-0000-0000-0000-000000000001','uno@example.test'),('00000000-0000-0000-0000-000000000002','dos@example.test');
     insert into public.usuario(usr_codigo__,usr_nombre__,usr_correo__,usr_telefono__,usr_fecha_registro__,usr_estado__,usr_auth_id)
     values ('U1','Uno','uno@example.test','0999999999',current_date,'A','00000000-0000-0000-0000-000000000001'),
@@ -35,6 +36,27 @@ async function probar() {
   assert.equal((await cuenta()).carrito.length, 0);
   assert.deepEqual((await operar('pedido', pedido)).rows[0].resultado, creado);
   assert.equal((await cuenta()).pedidos.length, 1);
+  await operar('carrito', { presentacion: 'V0000101', cantidad: 1 });
+  const simulado = { ...pedido, solicitud: '10000000-0000-0000-0000-000000000003', metodo: 'TARJDEMO' };
+  await assert.rejects(operar('pedido', { ...simulado, metodo: 'PAYPAL' }), /no disponible/);
+  await assert.rejects(operar('pedido', simulado), /resultado/);
+  await assert.rejects(operar('pedido', { ...simulado, simulacion: 'RECHAZADO' }), /rechazado/);
+  assert.equal((await cuenta()).carrito.length, 1);
+  assert.equal((await cuenta()).pedidos.length, 1);
+  const aprobado = { ...simulado, simulacion: 'APROBADO' };
+  const pagoSimulado = (await operar('pedido', aprobado)).rows[0].resultado;
+  assert.deepEqual((await operar('pedido', aprobado)).rows[0].resultado, pagoSimulado);
+  const historial = (await cuenta()).pedidos;
+  assert.equal(historial.length, 2);
+  const nuevo = historial.find((p) => p.codigo === pagoSimulado.pedido);
+  assert.equal(nuevo.pagos[0].estado, 'SIMULADO');
+  assert.equal(nuevo.resumen.pago_simulado, true);
+  assert.equal(nuevo.total, 12);
+  assert.equal((await cuenta()).carrito.length, 0);
+  await db.exec('reset role');
+  assert.equal(Number((await db.query("select pre_stock__ from public.presentacion where pre_codigo__='V0000101'")).rows[0].pre_stock__), 0);
+  assert.equal((await db.query("select orc_estado__ from public.orden_cobro where ped_codigo__=$1", [pagoSimulado.pedido])).rows[0].orc_estado__, 'SIMULADO');
+  await db.exec('set role authenticated');
   await db.exec("select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-000000000002',false)");
   assert.equal((await cuenta()).pedidos.length, 0);
   assert.equal((await cuenta()).favoritos.length, 0);
@@ -43,6 +65,6 @@ async function probar() {
   await db.exec("reset role; set role anon;");
   await assert.rejects(cuenta(), /permission/);
   await db.close();
-  console.log('PostgreSQL: aislamiento de cuentas, precios del servidor, stock, pagos pendientes e idempotencia correctos.');
+  console.log('PostgreSQL: aislamiento, precios, stock, pago simulado aprobado/rechazado, PayPal bloqueado e idempotencia correctos.');
 }
 probar().catch((error) => { console.error(error.message); process.exit(1); });

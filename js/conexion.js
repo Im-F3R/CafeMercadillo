@@ -196,16 +196,28 @@ async function agregarRemoto(id, cantidad, presentacion, peso, molienda) {
 async function pedidoRemoto(datos, formulario) {
   if (!solicitarSesion('checkout')) return;
   if (!datosDeEntregaValidos(datos)) throw new Error('Revisa el teléfono, provincia y ciudad');
+  if (datos.payment === 'PAYPAL') throw new Error('PayPal no está disponible');
+  const estado = $('#payment-status');
+  const boton = $('[form="checkout-form"]');
+  if (boton) boton.disabled = true;
+  if (estado) estado.textContent = datos.payment === 'TARJDEMO' ? 'Procesando pago simulado… No se realizará ningún cargo.' : 'Registrando pedido de prueba…';
   solicitudPedido ||= crypto.randomUUID();
-  const resultado = await operacionRemota('pedido', {
-    solicitud: solicitudPedido, nombre: `${datos.name} ${datos.surname}`.trim(), telefono: datos.phone,
-    provincia: datos.province, ciudad: datos.city, direccion: datos.address, referencia: datos.reference,
-    metodo: datos.payment,
-  });
-  lastOrder = orders.find((o) => o.number === resultado.pedido);
-  solicitudPedido = null;
-  await cargarCatalogoRemoto();
-  irA('confirmacion?id=' + encodeURIComponent(resultado.pedido));
+  try {
+    const resultado = await operacionRemota('pedido', {
+      solicitud: solicitudPedido, nombre: `${datos.name} ${datos.surname}`.trim(), telefono: datos.phone,
+      provincia: datos.province, ciudad: datos.city, direccion: datos.address, referencia: datos.reference,
+      metodo: datos.payment, simulacion: datos.payment === 'TARJDEMO' ? datos.cardResult : undefined,
+    });
+    lastOrder = orders.find((o) => o.number === resultado.pedido);
+    solicitudPedido = null;
+    await cargarCatalogoRemoto();
+    irA('confirmacion?id=' + encodeURIComponent(resultado.pedido));
+  } catch (error) {
+    if (estado) estado.textContent = error.message;
+    throw error;
+  } finally {
+    if (boton?.isConnected) boton.disabled = false;
+  }
 }
 
 async function cargarOpinionesRemotas() {

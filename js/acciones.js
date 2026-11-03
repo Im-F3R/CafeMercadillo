@@ -257,6 +257,7 @@ function manejarCambio(evento) {
   if (['presentation', 'weight', 'grind', 'product-qty'].includes(control.id))
     actualizarSeleccion();
   if (control.id === 'province') actualizarCiudades(control.value);
+  if (control.name === 'payment') actualizarMetodoPago();
   if (control.dataset.filter) aplicarFiltro(control);
   if (control.id === 'sort') {
     sort = control.value;

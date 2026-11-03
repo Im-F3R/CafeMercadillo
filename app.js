@@ -31,6 +31,7 @@ function mostrarPagina(conservarFoco = true) {
   };
   $('#app').innerHTML = (views[ruta.name] || mostrarInicio)();
   actualizarSeleccion();
+  actualizarMetodoPago();
   actualizarCategoriasAyuda();
   prepararAccesibilidad();
   actualizarResumenAyuda();

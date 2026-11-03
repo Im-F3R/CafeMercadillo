@@ -25,9 +25,11 @@
       <legend>Método de pago</legend>
       {{metodos}}
       </fieldset>
+      {{tarjeta}}
       <p class="demo-note">
-        Este formulario simula una compra. No se solicita ni procesa información bancaria.
+        Compra de demostración. La tarjeta permite simular aprobación o rechazo; transferencia y contra entrega quedan pendientes. No se realizan cargos reales.
       </p>
+      <p id="payment-status" role="status" aria-live="polite" aria-atomic="true"></p>
       <label>
         <input type="checkbox" name="terms" required />
         Acepto registrar un pedido de demostración.

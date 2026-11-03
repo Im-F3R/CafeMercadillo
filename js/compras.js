@@ -27,7 +27,7 @@ function crearResumen(mostrarPago = false) {
     descuento: formatearPrecio(discount),
     total: formatearPrecio(sub + shipping - discount),
     acciones: mostrarPago
-      ? '<button class="btn full" type="submit" form="checkout-form">Realizar pedido de prueba →</button>'
+      ? '<button class="btn full" type="submit" form="checkout-form">Confirmar pedido de prueba →</button>'
       : html`
           <div class="buttons">
             ${crearBoton('Continuar al pago →', 'checkout')}${crearBoton('Seguir comprando', 'tienda', true)}
@@ -115,8 +115,40 @@ function mostrarPago() {
     direccion: crearCampo('Dirección', 'address'),
     referencia: crearCampo('Referencia', 'reference', 'text', '', false),
     resumen: crearResumen(true),
-    metodos: metodosPago.map((m, indice) => `<label class="radio-option"><input type="radio" name="payment" value="${escaparTexto(m.met_codigo__)}" ${indice === 0 ? 'checked' : ''} required>${escaparTexto(m.met_nombre__)}</label>`).join(''),
+    metodos: metodosPago.filter((m) => m.met_codigo__ !== 'PAYPAL').sort((a, b) => Number(b.met_codigo__ === 'TARJDEMO') - Number(a.met_codigo__ === 'TARJDEMO')).map((m, indice) => `<label class="radio-option"><input type="radio" name="payment" value="${escaparTexto(m.met_codigo__)}" ${indice === 0 ? 'checked' : ''} required>${escaparTexto(m.met_nombre__)}</label>`).join('') + '<label class="radio-option"><input type="radio" name="payment" value="PAYPAL" disabled>PayPal · No disponible</label>',
+    tarjeta: metodosPago.some((m) => m.met_codigo__ === 'TARJDEMO') ? crearSimulacionTarjeta() : '',
   });
+}
+
+function crearSimulacionTarjeta() {
+  return html`
+    <fieldset id="card-demo">
+      <legend>Tarjeta de prueba</legend>
+      <p id="card-demo-help">Simulación académica, sin cargos reales. La tarjeta ficticia está precargada; no introduzcas datos bancarios.</p>
+      <p><strong>Tarjeta de demostración · •••• 4242</strong><br>Titular: Cliente de prueba</p>
+      <label>Resultado de la simulación
+        <select name="cardResult" aria-describedby="card-demo-help">
+          <option value="APROBADO">Aprobar pago de prueba</option>
+          <option value="RECHAZADO">Rechazar pago de prueba</option>
+        </select>
+      </label>
+    </fieldset>
+  `;
+}
+
+function actualizarMetodoPago() {
+  const tarjeta = $('#card-demo');
+  const activo = $('[name="payment"]:checked')?.value === 'TARJDEMO';
+  if (tarjeta) {
+    tarjeta.hidden = !activo;
+    tarjeta.disabled = !activo;
+  }
+  const boton = $('[form="checkout-form"]');
+  if (boton) boton.textContent = activo ? 'Simular pago y confirmar pedido →' : 'Confirmar pedido de prueba →';
+}
+
+function estadoPagoVisible(estado) {
+  return estado === 'SIMULADO' ? 'Aprobado en simulación · Sin cargo real' : estado || 'PENDIENTE';
 }
 
 function crearUbicacion() {
@@ -140,7 +172,7 @@ function crearDetallePedido(o) {
     numero: escaparTexto(o.number),
     estado: escaparTexto(o.status),
     fecha: new Date(o.date).toLocaleDateString('es-EC'),
-    pago: escaparTexto(o.payment) + ' · Estado del pago: ' + escaparTexto(o.paymentStatus || 'PENDIENTE'),
+    pago: escaparTexto(o.payment) + ' · Estado del pago: ' + escaparTexto(estadoPagoVisible(o.paymentStatus)),
     productos: o.items
       .map((c) => {
         const p = c.name ? { name: c.name, image: c.image, weight: c.weight } : buscarProducto(c.id) || { name: 'Producto', image: 'favicon.svg', weight: '' };
