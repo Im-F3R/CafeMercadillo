@@ -3,8 +3,9 @@
 const plantillas = new Map();
 
 const imagenesLocales = {
-  1: { carpeta: 'cafe-premium-loja', prefijo: 'CafeMercadilloLojano', extension: 'jpg' },
+  1: { carpeta: 'cafe-premium-loja', prefijo: 'CafeMercadilloLojano', extension: 'jpg', extensiones: { '250': 'png' } },
   2: { carpeta: 'cafe-altura-alamor', prefijo: 'CafeMercadilloAlturaAlamor', extension: 'png' },
+  3: { carpeta: 'cafe-origen-mercadillo', prefijo: 'CafeMercadillo', extension: 'jpg', extensiones: { '250': 'png', '450': 'png' } },
 };
 
 function imagenProducto(producto, presentacion = 'Molido', peso = '250 g') {
@@ -13,7 +14,7 @@ function imagenProducto(producto, presentacion = 'Molido', peso = '250 g') {
   const gramos = { '250 g': '250', '450 g': '450', '900 g': '900' }[peso];
   if (!gramos || !['Molido', 'En grano'].includes(presentacion)) return producto.image;
   const formato = presentacion === 'En grano' ? 'EnGrano' : '';
-  const extension = String(producto.id) === '1' && !formato && gramos === '250' ? 'png' : archivos.extension;
+  const extension = archivos.extensiones?.[`${formato}${gramos}`] || archivos.extension;
   return `imagenes/${archivos.carpeta}/${archivos.prefijo}${formato}${gramos}.${extension}`;
 }
 
