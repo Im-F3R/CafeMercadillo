@@ -94,7 +94,18 @@ async function probar() {
     }
   }
   assert.equal(imagenesMercadillo.size, 6);
-  assert.equal(run("imagenProducto({ id: 5, image: 'original.jpg' })"), 'original.jpg');
+  for (const id of [5, 11]) {
+    const rutas = new Set();
+    for (const presentacion of ['Molido', 'En grano']) {
+      for (const peso of ['250 g', '450 g', '900 g']) {
+        const ruta = run('imagenProducto')({ id }, presentacion, peso);
+        assert(fs.existsSync(ruta));
+        rutas.add(ruta);
+      }
+    }
+    assert.equal(rutas.size, 6);
+  }
+  assert.equal(run("imagenProducto({ id: 6, image: 'original.jpg' })"), 'original.jpg');
   navegar('producto?id=1');
   assert(w.document.querySelector('[data-action="add-detail"]').disabled);
   assert(w.document.querySelector('#unit-price').textContent.includes('17,25') || w.document.querySelector('#unit-price').textContent.includes('17.25'));
