@@ -74,7 +74,17 @@ async function probar() {
     }
   }
   assert.equal(imagenes.size, 6);
-  assert.equal(run("imagenProducto({ id: 2, image: 'original.jpg' })"), 'original.jpg');
+  const imagenesAlamor = new Set();
+  for (const presentacion of ['Molido', 'En grano']) {
+    for (const peso of ['250 g', '450 g', '900 g']) {
+      const ruta = run('imagenProducto')({ id: 2 }, presentacion, peso);
+      assert(fs.existsSync(ruta));
+      assert(ruta.includes('CafeMercadilloAlturaAlamor'));
+      imagenesAlamor.add(ruta);
+    }
+  }
+  assert.equal(imagenesAlamor.size, 6);
+  assert.equal(run("imagenProducto({ id: 3, image: 'original.jpg' })"), 'original.jpg');
   navegar('producto?id=1');
   assert(w.document.querySelector('[data-action="add-detail"]').disabled);
   assert(w.document.querySelector('#unit-price').textContent.includes('17,25') || w.document.querySelector('#unit-price').textContent.includes('17.25'));

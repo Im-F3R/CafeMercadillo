@@ -244,7 +244,7 @@ function mostrarProducto(id) {
     `),
     imagen: escaparTexto(imagenProducto(p)),
     nombreImagen: escaparTexto(p.name),
-    miniaturas: (String(p.id) === '1' ? [] : [p.image, imgs.cup, imgs.beans])
+    miniaturas: (imagenesLocales[p.id] ? [] : [p.image, imgs.cup, imgs.beans])
       .map(
         (im, i) => html`
             <button data-action="gallery" data-src="${escaparTexto(im)}" aria-label="Ver fotografía ${i + 1}">

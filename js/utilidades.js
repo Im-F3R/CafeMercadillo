@@ -2,13 +2,19 @@
 
 const plantillas = new Map();
 
+const imagenesLocales = {
+  1: { carpeta: 'cafe-premium-loja', prefijo: 'CafeMercadilloLojano', extension: 'jpg' },
+  2: { carpeta: 'cafe-altura-alamor', prefijo: 'CafeMercadilloAlturaAlamor', extension: 'png' },
+};
+
 function imagenProducto(producto, presentacion = 'Molido', peso = '250 g') {
-  if (String(producto?.id) !== '1') return producto?.image || 'favicon.svg';
+  const archivos = imagenesLocales[producto?.id];
+  if (!archivos) return producto?.image || 'favicon.svg';
   const gramos = { '250 g': '250', '450 g': '450', '900 g': '900' }[peso];
   if (!gramos || !['Molido', 'En grano'].includes(presentacion)) return producto.image;
   const formato = presentacion === 'En grano' ? 'EnGrano' : '';
-  const extension = !formato && gramos === '250' ? 'png' : 'jpg';
-  return `imagenes/cafe-premium-loja/CafeMercadilloLojano${formato}${gramos}.${extension}`;
+  const extension = String(producto.id) === '1' && !formato && gramos === '250' ? 'png' : archivos.extension;
+  return `imagenes/${archivos.carpeta}/${archivos.prefijo}${formato}${gramos}.${extension}`;
 }
 
 function urlPagina(ruta) {
