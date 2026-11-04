@@ -614,9 +614,10 @@ select {
   gap: 60px;
 }
 .detail-image {
+  display: block;
   width: 100%;
-  height: 480px;
-  object-fit: cover;
+  height: auto;
+  object-fit: contain;
   border-radius: 9px;
 }
 .thumbs {
@@ -969,9 +970,6 @@ select:disabled {
   }
   .page-title {
     font-size: 36px;
-  }
-  .detail-image {
-    height: 350px;
   }
   .fields {
     grid-template-columns: 1fr;
