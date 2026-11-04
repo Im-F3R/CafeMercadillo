@@ -55,6 +55,27 @@ async function probar() {
     assert.equal(w.document.querySelectorAll('#app [onerror]').length, 0, ruta);
   }
   navegar('producto?id=1');
+  w.document.querySelector('#presentation').innerHTML = '<option>Molido</option><option>En grano</option>';
+  w.document.querySelector('#weight').innerHTML = '<option>250 g</option><option>450 g</option><option>900 g</option>';
+  const imagenes = new Set();
+  for (const presentacion of ['Molido', 'En grano']) {
+    for (const peso of ['250 g', '450 g', '900 g']) {
+      w.document.querySelector('#presentation').value = presentacion;
+      w.document.querySelector('#weight').value = peso;
+      run('actualizarSeleccion()');
+      const src = w.document.querySelector('#detail-photo').getAttribute('src');
+      assert(fs.existsSync(src));
+      imagenes.add(src);
+      for (const molienda of ['Fina · espresso', 'Media · filtrado', 'Gruesa · prensa francesa']) {
+        w.document.querySelector('#grind').value = molienda;
+        run('actualizarSeleccion()');
+        assert.equal(w.document.querySelector('#detail-photo').getAttribute('src'), src);
+      }
+    }
+  }
+  assert.equal(imagenes.size, 6);
+  assert.equal(run("imagenProducto({ id: 2, image: 'original.jpg' })"), 'original.jpg');
+  navegar('producto?id=1');
   assert(w.document.querySelector('[data-action="add-detail"]').disabled);
   assert(w.document.querySelector('#unit-price').textContent.includes('17,25') || w.document.querySelector('#unit-price').textContent.includes('17.25'));
   await run('favoritoRemoto')({ dataset: { id: '1' } });

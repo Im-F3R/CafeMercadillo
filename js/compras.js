@@ -58,7 +58,7 @@ function mostrarCarrito() {
                   const p = buscarProducto(c.id);
                   return html`
                     <article class="cart-row">
-                      <img src="${escaparTexto(p.image)}" alt="${escaparTexto(p.name)}" />
+                      <img src="${escaparTexto(imagenProducto(p, c.presentation, c.weight))}" alt="${escaparTexto(p.name)}" />
                       <div class="info">
                         <h3 class="cart-product-title">
                           <a href="#producto?id=${p.id}">${escaparTexto(p.name)}</a>
@@ -178,7 +178,7 @@ function crearDetallePedido(o) {
         const p = c.name ? { name: c.name, image: c.image, weight: c.weight } : buscarProducto(c.id) || { name: 'Producto', image: 'favicon.svg', weight: '' };
         return html`
           <div class="cart-row">
-            <img src="${escaparTexto(p.image)}" alt="${escaparTexto(p.name)}" />
+            <img src="${escaparTexto(imagenProducto({ ...p, id: c.id }, c.presentation, c.weight))}" alt="${escaparTexto(p.name)}" />
             <div class="info">
               <strong>${escaparTexto(p.name)}</strong>
               <p>

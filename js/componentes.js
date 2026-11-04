@@ -144,7 +144,7 @@ function crearTarjetaProducto(p) {
     favoritoActivo: favorites.includes(p.id),
     iconoFavorito: favorites.includes(p.id) ? '♥' : '♡',
     idEnlace: p.id,
-    imagen: escaparTexto(p.image),
+    imagen: escaparTexto(imagenProducto(p)),
     textoAlternativo: escaparTexto(p.name),
     origen: escaparTexto(p.origin.toUpperCase()),
     peso: p.weight.toUpperCase(),

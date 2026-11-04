@@ -2,6 +2,15 @@
 
 const plantillas = new Map();
 
+function imagenProducto(producto, presentacion = 'Molido', peso = '250 g') {
+  if (String(producto?.id) !== '1') return producto?.image || 'favicon.svg';
+  const gramos = { '250 g': '250', '450 g': '450', '900 g': '900' }[peso];
+  if (!gramos || !['Molido', 'En grano'].includes(presentacion)) return producto.image;
+  const formato = presentacion === 'En grano' ? 'EnGrano' : '';
+  const extension = !formato && gramos === '250' ? 'png' : 'jpg';
+  return `imagenes/cafe-premium-loja/CafeMercadilloLojano${formato}${gramos}.${extension}`;
+}
+
 function urlPagina(ruta) {
   const [nombre, consulta] = ruta.split('?');
   const paginas = ['inicio', 'tienda', 'categoria', 'busqueda', 'producto', 'carrito', 'checkout', 'confirmacion', 'login', 'recuperar', 'cuenta', 'direcciones', 'pedidos', 'seguimiento', 'favoritos', 'nosotros', 'ayuda'];

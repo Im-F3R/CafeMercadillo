@@ -242,9 +242,9 @@ function mostrarProducto(id) {
       <a href="#categoria?tipo=${encodeURIComponent(p.category)}">${escaparTexto(p.category)}</a>
       / ${escaparTexto(p.name)}
     `),
-    imagen: escaparTexto(p.image),
+    imagen: escaparTexto(imagenProducto(p)),
     nombreImagen: escaparTexto(p.name),
-    miniaturas: [p.image, imgs.cup, imgs.beans]
+    miniaturas: (String(p.id) === '1' ? [] : [p.image, imgs.cup, imgs.beans])
       .map(
         (im, i) => html`
             <button data-action="gallery" data-src="${escaparTexto(im)}" aria-label="Ver fotografía ${i + 1}">
@@ -447,6 +447,11 @@ function actualizarSeleccion() {
   const presentation = $('#presentation').value,
     weight = $('#weight').value,
     price = calcularPrecioVariante(p, presentation, weight);
+  const fotografia = $('#detail-photo');
+  if (fotografia) {
+    fotografia.setAttribute('src', imagenProducto(p, presentation, weight));
+    fotografia.alt = `${p.name} · ${presentation} · ${weight}`;
+  }
   $('#unit-price').textContent = formatearPrecio(price);
   $('#selection-total').textContent = formatearPrecio(
     price * Math.max(1, Number($('#product-qty').value) || 1),
