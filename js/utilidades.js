@@ -10,7 +10,10 @@ const imagenesLocales = {
   6: { carpeta: 'cafe-intenso-alamor', prefijo: 'CafeMercadilloIntensoAlamor', extension: 'jpg', extensiones: { '250': 'png', '450': 'png', '900': 'png' } },
   7: { carpeta: 'cafe-suave-mercadillo', prefijo: 'CafeMercadilloSuaveMercadillo', extension: 'png' },
   8: { carpeta: 'cafe-organico-loja', prefijo: 'CafeMercadilloOrganico', extension: 'png' },
+  9: { carpeta: 'cafe-reserva-altura', prefijo: 'CafeMercadilloReservaAltura', extension: 'png' },
+  10: { carpeta: 'pack-origen', prefijo: 'CafeMercadilloPackOrigen', extension: 'png' },
   11: { carpeta: 'cafe-descafeinado', prefijo: 'CafeMercadilloDescaeinado', extension: 'png' },
+  12: { carpeta: 'cafe-tostado-artesanal', prefijo: 'CafeMercadilloTostadoArtesanal', extension: 'png' },
 };
 
 function imagenProducto(producto, presentacion = 'Molido', peso = '250 g') {

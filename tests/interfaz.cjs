@@ -94,7 +94,7 @@ async function probar() {
     }
   }
   assert.equal(imagenesMercadillo.size, 6);
-  for (const id of [5, 6, 7, 8, 11]) {
+  for (const id of [5, 6, 7, 8, 9, 10, 11, 12]) {
     const rutas = new Set();
     for (const presentacion of ['Molido', 'En grano']) {
       for (const peso of ['250 g', '450 g', '900 g']) {
@@ -105,7 +105,7 @@ async function probar() {
     }
     assert.equal(rutas.size, 6);
   }
-  assert.equal(run("imagenProducto({ id: 9, image: 'original.jpg' })"), 'original.jpg');
+  assert.equal(run("imagenProducto({ id: 99, image: 'original.jpg' })"), 'original.jpg');
   navegar('producto?id=1');
   assert(w.document.querySelector('[data-action="add-detail"]').disabled);
   assert(w.document.querySelector('#unit-price').textContent.includes('17,25') || w.document.querySelector('#unit-price').textContent.includes('17.25'));
