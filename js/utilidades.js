@@ -7,6 +7,9 @@ const imagenesLocales = {
   2: { carpeta: 'cafe-altura-alamor', prefijo: 'CafeMercadilloAlturaAlamor', extension: 'png' },
   3: { carpeta: 'cafe-origen-mercadillo', prefijo: 'CafeMercadillo', extension: 'jpg', extensiones: { '250': 'png', '450': 'png' } },
   5: { carpeta: 'cafe-especial-mercadillo', prefijo: 'CafeMercadilloEspecial', extension: 'jpg', extensiones: { '250': 'png', '450': 'png', '900': 'png' } },
+  6: { carpeta: 'cafe-intenso-alamor', prefijo: 'CafeMercadilloIntensoAlamor', extension: 'jpg', extensiones: { '250': 'png', '450': 'png', '900': 'png' } },
+  7: { carpeta: 'cafe-suave-mercadillo', prefijo: 'CafeMercadilloSuaveMercadillo', extension: 'png' },
+  8: { carpeta: 'cafe-organico-loja', prefijo: 'CafeMercadilloOrganico', extension: 'png' },
   11: { carpeta: 'cafe-descafeinado', prefijo: 'CafeMercadilloDescaeinado', extension: 'png' },
 };
 
