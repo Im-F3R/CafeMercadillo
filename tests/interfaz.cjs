@@ -141,6 +141,20 @@ async function probar() {
   assert(w.document.querySelector('[name="province"]'));
   await run('cargarOpinionesRemotas()');
   assert.equal(w.localStorage.getItem('mercadillo-accounts'), null);
+  const registro = { email: 'nuevo@example.test', password: 'prueba123', confirm: 'prueba123', name: 'Cliente', surname: 'Prueba' };
+  for (const code of ['user_already_exists', 'email_exists']) {
+    run("authTab = 'register'");
+    cliente.auth.signUp = async () => ({ data: {}, error: { code } });
+    await assert.rejects(run('accesoRemoto')(registro, null), /correo ya está registrado/);
+  }
+  cliente.auth.signUp = async () => ({ data: { user: { identities: [] }, session: null }, error: null });
+  await assert.rejects(run('accesoRemoto')(registro, null), /correo ya está registrado/);
+  for (const session of [null, { access_token: 'sesion-de-prueba' }]) {
+    run("authTab = 'register'");
+    cliente.auth.signUp = async () => ({ data: { user: { id: 'nuevo', identities: [{ provider: 'email' }] }, session }, error: null });
+    await run('accesoRemoto')(registro, null);
+    assert.equal(w.document.querySelector('#toast').textContent, 'Cuenta creada correctamente');
+  }
   pagina.window.close();
   console.log('Interfaz: catálogo remoto, precio por variante, stock pendiente, acceso requerido y favorito tras login correctos.');
 }

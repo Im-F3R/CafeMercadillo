@@ -144,6 +144,7 @@ async function conectarTienda() {
 }
 
 async function accesoRemoto(datos, formulario) {
+  const creandoCuenta = authTab === 'register';
   if (authTab === 'register' && datos.password !== datos.confirm) {
     errorFormulario(formulario, 'confirm', 'Las contraseñas no coinciden');
     return;
@@ -157,15 +158,21 @@ async function accesoRemoto(datos, formulario) {
         email_address_invalid: 'El servicio de acceso rechazó esta dirección de correo. Revisa que esté escrita correctamente.',
         email_address_not_authorized: 'El servicio de correo no tiene autorizado enviar a esta dirección. Contacta al administrador de la demostración.',
         over_request_rate_limit: 'Has realizado demasiados intentos. Espera unos minutos antes de volver a registrarte.',
-        user_already_exists: 'Ya existe una cuenta con este correo. Inicia sesión con tu contraseña.',
+        user_already_exists: 'No se puede crear la cuenta porque este correo ya está registrado. Inicia sesión con tu contraseña.',
+        email_exists: 'No se puede crear la cuenta porque este correo ya está registrado. Inicia sesión con tu contraseña.',
         weak_password: 'La contraseña no cumple los requisitos de seguridad. Usa al menos 6 caracteres.'
       };
       throw new Error(mensajes[error.code] || 'No se pudo crear la cuenta. Inténtalo nuevamente en unos momentos.');
     }
+    if (data.user?.identities?.length === 0) {
+      throw new Error('No se puede crear la cuenta porque este correo ya está registrado. Inicia sesión con tu contraseña.');
+    }
+    if (!data.user) throw new Error('No se pudo comprobar la creación de la cuenta. Inténtalo nuevamente.');
     if (!data.session) {
       sessionStorage.setItem('mercadillo-favorito-pendiente', JSON.stringify(favoritoPendiente));
-      mostrarMensaje('Revisa tu correo para confirmar la cuenta. Después inicia sesión.');
-      authTab = 'login'; mostrarPagina(); return;
+      authTab = 'login'; mostrarPagina();
+      mostrarMensaje('Cuenta creada correctamente');
+      return;
     }
   } else {
     const { error } = await baseDatos.auth.signInWithPassword({ email: datos.email.trim(), password: datos.password });
@@ -189,7 +196,7 @@ async function accesoRemoto(datos, formulario) {
   irA(returnTo);
   returnTo = 'cuenta';
   mostrarPagina();
-  mostrarMensaje('Sesión iniciada');
+  mostrarMensaje(creandoCuenta ? 'Cuenta creada correctamente' : 'Sesión iniciada');
 }
 
 async function favoritoRemoto(boton) {
