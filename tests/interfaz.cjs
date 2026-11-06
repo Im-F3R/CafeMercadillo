@@ -44,6 +44,17 @@ async function probar() {
   }
   for (const archivo of fs.readdirSync('plantillas')) run(`plantillas.set(${JSON.stringify(archivo.slice(0, -5))},${JSON.stringify(fs.readFileSync('plantillas/' + archivo, 'utf8'))})`);
   await run('conectarTienda()');
+  const iniciarSesion = cliente.auth.signInWithPassword;
+  for (const [code, texto] of [
+    ['invalid_credentials', 'El correo o la contraseña son incorrectos'],
+    ['email_not_confirmed', 'Esta cuenta tiene pendiente la confirmación'],
+    ['over_request_rate_limit', 'Has realizado demasiados intentos'],
+    ['unexpected_failure', 'No se pudo conectar con el servicio de acceso']
+  ]) {
+    cliente.auth.signInWithPassword = async () => ({ error: { code } });
+    await assert.rejects(run('accesoRemoto({email: "cliente@example.test", password: "prueba123"}, null)'), (error) => error.message.startsWith(texto));
+  }
+  cliente.auth.signInWithPassword = iniciarSesion;
   assert.equal(run('products.length'), 1);
   assert.equal(run('products[0].price'), 17.25);
   assert.equal(run('products[0].stock'), false);

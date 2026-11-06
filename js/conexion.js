@@ -151,7 +151,17 @@ async function accesoRemoto(datos, formulario) {
   if (authTab === 'register') {
     const { data, error } = await baseDatos.auth.signUp({ email: datos.email.trim(), password: datos.password,
       options: { emailRedirectTo: location.origin + '/', data: { nombre: `${datos.name} ${datos.surname}`.trim() } } });
-    if (error) throw error;
+    if (error) {
+      const mensajes = {
+        over_email_send_rate_limit: 'El servicio alcanzó el límite de envío de correos. No sigas intentando con otros correos; contacta al administrador de la demostración.',
+        email_address_invalid: 'El servicio de acceso rechazó esta dirección de correo. Revisa que esté escrita correctamente.',
+        email_address_not_authorized: 'El servicio de correo no tiene autorizado enviar a esta dirección. Contacta al administrador de la demostración.',
+        over_request_rate_limit: 'Has realizado demasiados intentos. Espera unos minutos antes de volver a registrarte.',
+        user_already_exists: 'Ya existe una cuenta con este correo. Inicia sesión con tu contraseña.',
+        weak_password: 'La contraseña no cumple los requisitos de seguridad. Usa al menos 6 caracteres.'
+      };
+      throw new Error(mensajes[error.code] || 'No se pudo crear la cuenta. Inténtalo nuevamente en unos momentos.');
+    }
     if (!data.session) {
       sessionStorage.setItem('mercadillo-favorito-pendiente', JSON.stringify(favoritoPendiente));
       mostrarMensaje('Revisa tu correo para confirmar la cuenta. Después inicia sesión.');
@@ -159,7 +169,15 @@ async function accesoRemoto(datos, formulario) {
     }
   } else {
     const { error } = await baseDatos.auth.signInWithPassword({ email: datos.email.trim(), password: datos.password });
-    if (error) throw new Error('No se pudo iniciar sesión. Revisa correo, contraseña y confirmación del correo.');
+    if (error) {
+      const mensajes = {
+        invalid_credentials: 'El correo o la contraseña son incorrectos. Revisa tus datos e inténtalo nuevamente.',
+        email_not_confirmed: 'Esta cuenta tiene pendiente la confirmación. Contacta al administrador de la demostración para habilitarla.',
+        over_request_rate_limit: 'Has realizado demasiados intentos. Espera unos minutos antes de volver a iniciar sesión.',
+        user_banned: 'Esta cuenta no está habilitada. Contacta al administrador.'
+      };
+      throw new Error(mensajes[error.code] || 'No se pudo conectar con el servicio de acceso. Inténtalo nuevamente en unos momentos.');
+    }
   }
   await cargarCuentaRemota();
   const pendiente = favoritoPendiente ?? JSON.parse(sessionStorage.getItem('mercadillo-favorito-pendiente') || 'null');
