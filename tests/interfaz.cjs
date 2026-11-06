@@ -149,7 +149,9 @@ async function probar() {
   }
   cliente.auth.signUp = async () => ({ data: { user: { identities: [] }, session: null }, error: null });
   await assert.rejects(run('accesoRemoto')(registro, null), /correo ya está registrado/);
-  for (const session of [null, { access_token: 'sesion-de-prueba' }]) {
+  cliente.auth.signUp = async () => ({ data: { user: { id: 'nuevo', identities: [{ provider: 'email' }] }, session: null }, error: null });
+  await assert.rejects(run('accesoRemoto')(registro, null), /no se pudo iniciar la sesión automáticamente/);
+  for (const session of [{ access_token: 'sesion-de-prueba' }]) {
     run("authTab = 'register'");
     cliente.auth.signUp = async () => ({ data: { user: { id: 'nuevo', identities: [{ provider: 'email' }] }, session }, error: null });
     await run('accesoRemoto')(registro, null);
