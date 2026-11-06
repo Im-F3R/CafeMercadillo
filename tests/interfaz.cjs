@@ -132,10 +132,14 @@ async function probar() {
   assert.equal(w.document.querySelector('#card-demo').hidden, false);
   assert.equal(w.document.querySelector('[name="cardResult"]').value, 'APROBADO');
   assert(w.document.querySelector('[form="checkout-form"]').textContent.includes('Simular pago'));
-  w.document.querySelector('[value="TRANSF"]').checked = true;
-  run('actualizarMetodoPago()');
-  assert(w.document.querySelector('#card-demo').disabled);
-  assert(w.document.querySelector('#card-demo').hidden);
+  assert.equal(w.document.querySelector('[value="TRANSF"]'), null);
+  assert.equal(w.document.querySelector('[value="CONTRA"]'), null);
+  assert.equal(w.document.querySelector('[name="surname"]').value, 'Prueba');
+  run("addresses = [{ code: 'D1', province: 'Loja', city: 'Loja', address: 'Calle uno', reference: 'Puerta azul' }]");
+  navegar('checkout');
+  run("cargarDireccionCompra('D1')");
+  assert.equal(w.document.querySelector('[name="reference"]').value, 'Puerta azul');
+  assert.equal(w.document.querySelector('[name="city"]').value, 'Loja');
   assert(run("estadoPagoVisible('SIMULADO')").includes('Sin cargo real'));
   navegar('direcciones');
   assert(w.document.querySelector('[name="province"]'));

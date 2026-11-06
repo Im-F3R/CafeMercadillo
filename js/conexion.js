@@ -151,7 +151,7 @@ async function accesoRemoto(datos, formulario) {
   }
   if (authTab === 'register') {
     const { data, error } = await baseDatos.auth.signUp({ email: datos.email.trim(), password: datos.password,
-      options: { data: { nombre: `${datos.name} ${datos.surname}`.trim() } } });
+      options: { data: { nombre: datos.name.trim(), apellido: datos.surname.trim() } } });
     if (error) {
       const mensajes = {
         over_email_send_rate_limit: 'El servicio alcanzó el límite de envío de correos. No sigas intentando con otros correos; contacta al administrador de la demostración.',

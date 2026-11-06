@@ -111,11 +111,12 @@ function mostrarPago() {
     apellido: crearCampo('Apellido', 'surname', 'text', profile?.surname || ''),
     correo: crearCampo('Correo electrónico', 'email', 'email', profile?.email || ''),
     telefono: crearCampo('Teléfono', 'phone', 'tel', profile?.phone || ''),
+    direcciones: crearSelectorDireccion(),
     ubicacion: crearUbicacion(),
     direccion: crearCampo('Dirección', 'address'),
-    referencia: crearCampo('Referencia', 'reference', 'text', '', false),
+    referencia: crearCampo('Indicaciones de entrega (opcional)', 'reference', 'text', '', false),
     resumen: crearResumen(true),
-    metodos: metodosPago.filter((m) => m.met_codigo__ !== 'PAYPAL').sort((a, b) => Number(b.met_codigo__ === 'TARJDEMO') - Number(a.met_codigo__ === 'TARJDEMO')).map((m, indice) => `<label class="radio-option"><input type="radio" name="payment" value="${escaparTexto(m.met_codigo__)}" ${indice === 0 ? 'checked' : ''} required>${escaparTexto(m.met_nombre__)}</label>`).join('') + '<label class="radio-option"><input type="radio" name="payment" value="PAYPAL" disabled>PayPal · No disponible</label>',
+    metodos: metodosPago.filter((m) => m.met_codigo__ === 'TARJDEMO').sort((a, b) => Number(b.met_codigo__ === 'TARJDEMO') - Number(a.met_codigo__ === 'TARJDEMO')).map((m, indice) => `<label class="radio-option"><input type="radio" name="payment" value="${escaparTexto(m.met_codigo__)}" ${indice === 0 ? 'checked' : ''} required>${escaparTexto(m.met_nombre__)}</label>`).join('') + '<label class="radio-option"><input type="radio" name="payment" value="PAYPAL" disabled>PayPal · No disponible</label>',
     tarjeta: metodosPago.some((m) => m.met_codigo__ === 'TARJDEMO') ? crearSimulacionTarjeta() : '',
   });
 }
@@ -313,4 +314,18 @@ function mostrarSeguimiento(r) {
       <div id="tracking-result"></div>
       </div>
   `;
+}
+
+function crearSelectorDireccion() {
+  if (!addresses.length) return '';
+  return '<label>Dirección guardada<select id="checkout-address"><option value="">Selecciona una dirección o escribe una nueva</option>' + addresses.map((direccion) => '<option value="' + escaparTexto(direccion.code) + '">' + escaparTexto(direccion.address + ' · ' + direccion.city) + '</option>').join('') + '</select></label>';
+}
+
+function cargarDireccionCompra(codigo) {
+  const direccion = addresses.find((item) => item.code === codigo);
+  $('#province').value = direccion?.province || '';
+  actualizarCiudades($('#province').value);
+  $('#city').value = direccion?.city || '';
+  $('[name="address"]').value = direccion?.address || '';
+  $('[name="reference"]').value = direccion?.reference || '';
 }

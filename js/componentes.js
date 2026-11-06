@@ -113,10 +113,8 @@ function mostrarPie() {
             </div>
             <div>
               <h2>Estamos para ayudarte</h2>
-              <a href="#seguimiento">Consultar un pedido</a>
               <a href="#ayuda">Preguntas frecuentes</a>
               <a href="#ayuda?tema=Envíos">Envíos y entregas</a>
-              <a href="#ayuda?tema=Devoluciones">Devoluciones</a>
               <a href="#ayuda?tema=Cuenta">Términos y privacidad</a>
             </div>
             <div>

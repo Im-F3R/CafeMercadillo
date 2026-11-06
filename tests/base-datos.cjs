@@ -13,7 +13,7 @@ async function probar() {
     alter table public.usuario alter column usr_password_hash__ drop not null;`);
   await db.exec(fs.readFileSync('database/catalogo-demostracion.sql', 'utf8'));
   await db.exec(fs.readFileSync('database/002-integracion-tienda.sql', 'utf8'));
-  await db.exec(fs.readFileSync('supabase/migrations/20261103042200_simular_pago_tarjeta.sql', 'utf8'));
+  await db.exec(fs.readFileSync('supabase/migrations/20261106200000_checkout_solo_tarjeta.sql', 'utf8'));
   await db.exec(`insert into auth.users values ('00000000-0000-0000-0000-000000000001','uno@example.test'),('00000000-0000-0000-0000-000000000002','dos@example.test');
     insert into public.usuario(usr_codigo__,usr_nombre__,usr_correo__,usr_telefono__,usr_fecha_registro__,usr_estado__,usr_auth_id)
     values ('U1','Uno','uno@example.test','0999999999',current_date,'A','00000000-0000-0000-0000-000000000001'),
@@ -29,15 +29,17 @@ async function probar() {
   await db.exec("reset role; update public.presentacion set pre_stock__=3 where pre_codigo__='V0000101'; set role authenticated;");
   await operar('carrito', { presentacion: 'V0000101', cantidad: 2, precio: 0.01 });
   await assert.rejects(operar('carrito', { presentacion: 'V0000101', cantidad: -1 }));
-  const pedido = { solicitud: '10000000-0000-0000-0000-000000000001', nombre: 'Uno', telefono: '0999999999', provincia: 'Loja', ciudad: 'Loja', direccion: 'Calle de prueba', referencia: '', metodo: 'TRANSF', total: 0.01 };
+  const pedido = { solicitud: '10000000-0000-0000-0000-000000000001', nombre: 'Uno', telefono: '0999999999', provincia: 'Loja', ciudad: 'Loja', direccion: 'Calle de prueba', referencia: '', metodo: 'TARJDEMO', simulacion: 'APROBADO', total: 0.01 };
+  await assert.rejects(operar('pedido', { ...pedido, metodo: 'TRANSF' }), /no disponible/);
+  await assert.rejects(operar('pedido', { ...pedido, metodo: 'CONTRA' }), /no disponible/);
   const creado = (await operar('pedido', pedido)).rows[0].resultado;
   assert.equal((await cuenta()).pedidos[0].total, 20.5);
-  assert.equal((await cuenta()).pedidos[0].pagos[0].estado, 'PENDIENTE');
+  assert.equal((await cuenta()).pedidos[0].pagos[0].estado, 'SIMULADO');
   assert.equal((await cuenta()).carrito.length, 0);
   assert.deepEqual((await operar('pedido', pedido)).rows[0].resultado, creado);
   assert.equal((await cuenta()).pedidos.length, 1);
   await operar('carrito', { presentacion: 'V0000101', cantidad: 1 });
-  const simulado = { ...pedido, solicitud: '10000000-0000-0000-0000-000000000003', metodo: 'TARJDEMO' };
+  const simulado = { ...pedido, solicitud: '10000000-0000-0000-0000-000000000003', metodo: 'TARJDEMO', simulacion: undefined };
   await assert.rejects(operar('pedido', { ...simulado, metodo: 'PAYPAL' }), /no disponible/);
   await assert.rejects(operar('pedido', simulado), /resultado/);
   await assert.rejects(operar('pedido', { ...simulado, simulacion: 'RECHAZADO' }), /rechazado/);

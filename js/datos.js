@@ -411,17 +411,12 @@ const faqs = [
   [
     'Pagos',
     '¿Qué métodos de pago aceptan?',
-    'Puedes simular un pedido con transferencia bancaria o pago contra entrega. No se procesa ningún cobro.',
+    'Puedes simular un pago con tarjeta aprobado o rechazado. PayPal está deshabilitado. No se realizan cargos reales.',
   ],
   [
     'Compras',
     '¿Cómo puedo rastrear mi pedido?',
     'Inicia sesión y entra en Mis pedidos. Los pedidos de tu cuenta están disponibles desde cualquier dispositivo.',
-  ],
-  [
-    'Devoluciones',
-    '¿Cómo realizo una devolución?',
-    'Completa el formulario de contacto con el número de pedido y tu consulta. El formulario es de demostración y no envía mensajes.',
   ],
   [
     'Cuenta',

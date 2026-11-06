@@ -22,7 +22,7 @@ function mostrarAyuda(r) {
   helpCategory = r.params.get('tema') || helpCategory;
   return plantilla('ayuda', {
     ruta: crearRuta('Ayuda'),
-    categorias: ['Compras', 'Envíos', 'Pagos', 'Cuenta', 'Devoluciones']
+    categorias: ['Compras', 'Envíos', 'Pagos', 'Cuenta']
       .map(
         (c) => html`
           <button data-action="help-category" data-value="${c}">${c}</button>
